@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - UPI Savings</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    form, ul { margin-top: 20px; }
+    input, button { padding: 6px; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h2>Welcome, <span id="username"></span>!</h2>
+
+  <!-- Create New Goal -->
+  <form action="/savings-goal" method="POST">
+    <h3>Create a New Savings Goal</h3>
+    <input type="text" name="goal_name" placeholder="Goal (e.g., Buy Bike)" required><br>
+    <input type="number" step="0.01" name="target_amount" placeholder="Target Amount" required><br>
+    <button type="submit">Add Goal</button>
+  </form>
+
+  <!-- Add to Existing Goal -->
+  <form action="/add-to-goal" method="POST">
+    <h3>Add Money to a Goal</h3>
+    <input type="text" name="goal_name" placeholder="Goal name (exactly)" required><br>
+    <input type="number" step="0.01" name="amount" placeholder="Amount to add" required><br>
+    <button type="submit">Add to Goal</button>
+  </form>
+
+  <!-- List of Goals -->
+  <h3>Your Savings Goals</h3>
+  <ul id="goalList"></ul>
+
+  <br>
+  <a href="/logout">Logout</a>
+
+  <script>
+    // Fetch goals from server
+    fetch('/savings-goals')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('goalList');
+        const usernameSpan = document.getElementById('username');
+
+        if (data.user) {
+          usernameSpan.textContent = data.user.name;
+        }
+
+        if (data.goals && data.goals.length > 0) {
+          data.goals.forEach(goal => {
+            const li = document.createElement('li');
+            li.textContent = `${goal.goal_name} - ₹${goal.saved_amount} / ₹${goal.target_amount}`;
+            list.appendChild(li);
+          });
+        } else {
+          list.innerHTML = '<li>No goals yet.</li>';
+        }
+      });
+  </script>
+</body>
+</html>
