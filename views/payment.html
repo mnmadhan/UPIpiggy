@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choose Payment Method</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8fc;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .payment-options {
+      display: flex;
+      gap: 30px;
+    }
+
+    .methods {
+      width: 250px;
+      border-right: 1px solid #ddd;
+    }
+
+    .methods label {
+      display: block;
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .methods input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    .details {
+      flex: 1;
+    }
+
+    .details select,
+    .details input,
+    .details button {
+      display: block;
+      width: 100%;
+      margin: 20px 0;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    .details button {
+      background: #e60073;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .back-link {
+      margin-top: 20px;
+      display: inline-block;
+      color: #333;
+      text-decoration: none;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Choose Payment Method</h2>
+
+    <form id="paymentForm">
+      <div class="payment-options">
+        <div class="methods">
+          <label><input type="radio" name="paymentMethod" value="UPI" checked> UPI</label>
+          <label><input type="radio" name="paymentMethod" value="Debit Card"> Debit Card</label>
+          <label><input type="radio" name="paymentMethod" value="Net Banking"> Net Banking</label>
+        </div>
+
+        <div class="details">
+          <label for="goal">Select Savings Goal:</label>
+          <select id="goal" required></select>
+
+          <label for="amount">Enter Amount (INR):</label>
+          <input type="number" id="amount" placeholder="Enter amount" min="1" required>
+
+          <button type="submit">Add Money</button>
+        </div>
+      </div>
+    </form>
+
+    <a class="back-link" href="/dashboard">← Back to Dashboard</a>
+  </div>
+
+  <script>
+    const goalDropdown = document.getElementById("goal");
+
+    // Fetch user goals
+    fetch('/savings-goals')
+      .then(res => res.json())
+      .then(data => {
+        const goals = data.goals;
+        goals.forEach(g => {
+          const option = document.createElement("option");
+          option.value = g.goal_name;
+          option.text = `${g.goal_name} (Saved ₹${g.saved_amount} / ₹${g.target_amount})`;
+          goalDropdown.appendChild(option);
+        });
+      });
+
+    // Submit form
+    document.getElementById("paymentForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const goal_name = document.getElementById("goal").value;
+      const amount = document.getElementById("amount").value;
+
+      const res = await fetch('/add-to-goal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal_name, amount })
+      });
+
+      if (res.ok) {
+        alert('Money added to your goal!');
+        window.location.href = '/dashboard';
+      } else {
+        alert('Failed to add money.');
+      }
+    });
+  </script>
+</body>
+</html>

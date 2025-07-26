@@ -10,27 +10,31 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json()); // For JSON from fetch
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session
+// Sessions
 app.use(session({
   secret: 'upi-secret-key',
   resave: false,
   saveUninitialized: false
 }));
 
+// Serve static views
+app.use(express.static(path.join(__dirname, 'views')));
+
 // Routes
 app.use('/', routes);
 
-// Dashboard route
+// Dashboard
 app.get('/dashboard', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');
   }
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
-// Logout route
+// Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
@@ -39,6 +43,14 @@ app.get('/logout', (req, res) => {
     }
     res.redirect('/login');
   });
+});
+
+// Payment Page
+app.get('/payment', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'views', 'payment.html'));
 });
 
 // Start server
