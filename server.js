@@ -1,59 +1,60 @@
-require('dotenv').config();
 const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
 const session = require('express-session');
+const bodyParser = require('body-parser');
+const path = require('path');
+require('dotenv').config();
+
 const routes = require('./server/routes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json()); // For JSON from fetch
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-// Sessions
 app.use(session({
-  secret: 'upi-secret-key',
+  secret: 'your_secret_key',
   resave: false,
   saveUninitialized: false
 }));
 
-// Serve static views
+// Serve static files from public and views
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
 
-// Routes
+// ✅ Routes to serve HTML pages
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/index.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/login.html'));
+});
+
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/signup.html'));
+});
+
+app.get('/otp', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/otp.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/dashboard.html'));
+});
+
+app.get('/payment', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/payment.html'));
+});
+
+// Use backend routes
 app.use('/', routes);
 
-// Dashboard
-app.get('/dashboard', (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
-  res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
-});
-
-// Logout
-app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      console.error('Logout error:', err);
-      return res.send('Error during logout');
-    }
-    res.redirect('/login');
-  });
-});
-
-// Payment Page
-app.get('/payment', (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
-  res.sendFile(path.join(__dirname, 'views', 'payment.html'));
+// 404 handler
+app.use((req, res) => {
+  res.status(404).send('Page not found');
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
