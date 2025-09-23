@@ -1,44 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Verify OTP</title>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTP Verification - UPI Money Bank</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #f0f2f5;
+      font-family: Arial, sans-serif;
+    }
+    .otp-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .otp-container h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+    .otp-container input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+    .otp-container button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .otp-container button:hover {
+      background: #0056b3;
+    }
+    #msg {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Verify OTP</h2>
-  <form action="/verify-otp" method="POST">
-    <input type="email" name="email" placeholder="Enter your email" required /><br />
-    <input type="text" name="otp" placeholder="Enter OTP" required /><br />
-    <button type="submit">Verify</button>
-  </form>
-
-
-
-  <p id="message" style="color: red;"></p>
+  <div class="otp-container">
+    <h2>Verify OTP</h2>
+    <form id="otpForm">
+      <input type="text" id="otp" name="otp" placeholder="Enter OTP" required maxlength="6" />
+      <button type="submit">Verify OTP</button>
+    </form>
+    <div id="msg"></div>
+  </div>
 
   <script>
-    document.getElementById('otpForm').addEventListener('submit', async function (e) {
+    document.getElementById("otpForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      const otp = e.target.otp.value;
+      const otp = document.getElementById("otp").value.trim();
 
       try {
-        const res = await fetch('/verify-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/verify-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ otp })
         });
+        const data = await res.json();
+        const msg = document.getElementById("msg");
 
-        const result = await res.json();
-
-        if (result.success) {
-          window.location.href = '/dashboard.html';
+        if (data.success) {
+          msg.innerHTML = `<p style="color:green;">✅ ${data.message}</p>`;
+          setTimeout(() => window.location.href = "/complete-profile", 1200);
         } else {
-          document.getElementById('message').textContent = result.message || "Invalid OTP.";
+          msg.innerHTML = `<p style="color:red;">❌ ${data.message}</p>`;
         }
       } catch (err) {
-        document.getElementById('message').textContent = "An error occurred.";
+        console.error(err);
+        document.getElementById("msg").innerHTML = `<p style="color:red;">Something went wrong!</p>`;
       }
     });
   </script>

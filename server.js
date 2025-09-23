@@ -1,60 +1,38 @@
+// server.js
 const express = require('express');
 const session = require('express-session');
-const bodyParser = require('body-parser');
 const path = require('path');
-require('dotenv').config();
-
-const routes = require('./server/routes');
+const bodyParser = require('body-parser');
+const routes = require('./server/routes'); // ✅ Correct path
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
+// Sessions
 app.use(session({
-  secret: 'your_secret_key',
+  secret: process.env.SESSION_SECRET || 'your-secret-key', // 🔒 Use env in production
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { secure: false } // true only if HTTPS
 }));
 
-// Serve static files from public and views
+// Static files (CSS, JS, images)
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'views')));
 
-// ✅ Routes to serve HTML pages
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/index.html'));
-});
+// Serve uploaded profile pictures
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/login.html'));
-});
-
-app.get('/signup', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/signup.html'));
-});
-
-app.get('/otp', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/otp.html'));
-});
-
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/dashboard.html'));
-});
-
-app.get('/payment', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/payment.html'));
-});
-
-// Use backend routes
+// Routes
 app.use('/', routes);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).send('Page not found');
-});
+// ✅ Serve HTML files from views folder
+app.use(express.static(path.join(__dirname, 'views')));
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// Server start
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});

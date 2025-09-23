@@ -1,66 +1,96 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
+const pool = require('./db'); // ✅ make sure you import your db pool
+
+// Controllers
 const authController = require('./controllers/authController');
 const paymentController = require('./controllers/paymentController');
-const db = require('./db');
 
-// Auth Routes
+// ---------------- STATIC PAGES (Frontend Views) ----------------
+router.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/index.html'));
+});
+
+router.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/login.html'));
+});
+
+router.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/signup.html'));
+});
+
+router.get('/otp', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/otp.html'));
+});
+
+router.get('/dashboard', authController.ensureAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/dashboard.html'));
+});
+
+router.get('/payment', authController.ensureAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/payment.html'));
+});
+
+// ---------------- PROFILE (API) ----------------
+// Get logged in user profile
+router.get('/profile', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: 'Not logged in' });
+  }
+  res.json({ success: true, user: req.session.user });
+});
+
+
+// ✅ NEW: Complete Profile page (after signup)
+router.get('/complete-profile', authController.ensureAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/complete-profile.html'));
+});
+
+// ---------------- AUTH ROUTES ----------------
 router.post('/signup', authController.signup);
 router.post('/verify-otp', authController.verifyOtp);
-router.post('/login', authController.login);
-router.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/');
-  });
+router.post('/login', authController.login); // ⚡ inside this, set req.session.userId = user.id
+router.get('/logout', authController.logout);
+
+// ---------------- COMPLETE PROFILE ----------------
+router.post('/complete-profile', authController.ensureAuth, authController.completeProfile);
+
+// ---------------- SAVINGS GOALS ----------------
+router.post('/goals', authController.ensureAuth, authController.createGoal);
+router.get('/goals', authController.ensureAuth, authController.getGoals);
+router.post('/goals/:id/add', authController.ensureAuth, authController.addToGoal);
+
+// ---------------- PAYMENTS ----------------
+router.post('/payment', authController.ensureAuth, paymentController.processPayment);
+
+// ---------------- PROFILE UPDATE ----------------
+router.post('/profile/upload', authController.ensureAuth, authController.uploadProfilePicture);
+router.post('/profile/update', authController.ensureAuth, authController.updateProfile);
+
+// ---------------- FORGOT / RESET PASSWORD ----------------
+router.get('/forgot-password', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/forgot-password.html'));
 });
 
-// Get current user's savings goals
-router.get('/savings-goals', async (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
-
-  try {
-    const userId = req.session.user.id;
-    const goalsQuery = `
-      SELECT id, goal_name, target_amount, saved_amount
-      FROM savings_goals
-      WHERE user_id = $1
-    `;
-    const goals = await db.query(goalsQuery, [userId]);
-
-    res.json({
-      user: {
-        id: req.session.user.id,
-        name: req.session.user.name,
-        email: req.session.user.email
-      },
-      goals: goals.rows
-    });
-  } catch (err) {
-    console.error('Error fetching goals:', err);
-    res.status(500).json({ error: 'Something went wrong' });
-  }
+router.get('/reset-password', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/reset-password.html'));
 });
 
-// Add new savings goal
-router.post('/savings-goal', async (req, res) => {
-  if (!req.session.user) return res.status(401).send('Not logged in');
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
-  const { goal_name, target_amount } = req.body;
-
-  try {
-    await db.query(
-      `INSERT INTO savings_goals (user_id, goal_name, target_amount, saved_amount)
-       VALUES ($1, $2, $3, 0)`,
-      [req.session.user.id, goal_name, target_amount]
-    );
-    res.redirect('/dashboard.html');
-  } catch (err) {
-    console.error('Error adding goal:', err);
-    res.status(500).send('Failed to add goal');
-  }
+// ---------------- SPONSORED GOALS ----------------
+router.get('/sponsored-goals', (req, res) => {
+  // 🔥 Match fields with dashboard.html expectations
+  const sponsoredGoals = [
+    { id: 1, goal_name: "Buy a Bike", target_amount: 20000, sponsor_benefits: "Discount on accessories" },
+    { id: 2, goal_name: "iPhone 16 Pro", target_amount: 120000, sponsor_benefits: "Cashback on purchase" },
+    { id: 3, goal_name: "Goa Trip", target_amount: 30000, sponsor_benefits: "Travel vouchers included" }
+  ];
+  res.json({ success: true, sponsoredGoals });
 });
 
-// Handle payment
-router.post('/payment', paymentController.makePayment); 
+router.post('/sponsored-goals/select', authController.ensureAuth, authController.selectSponsoredGoal);
 
 module.exports = router;
