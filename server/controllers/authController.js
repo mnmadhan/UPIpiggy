@@ -340,13 +340,15 @@ exports.uploadProfilePicture = async (req, res) => {
 };
 
 // ---------- MIDDLEWARE ---------- //
-exports.ensureAuth = (req, res, next) => {
-  if (req.session && req.session.user) {
+// ----------- MIDDLEWARE ----------- //
+export const ensureAuth = (req, res, next) => {
+  if (req.session?.user) { // ✅ Optional chaining for concise, safe access
     return next();
   } else {
     return res.status(401).json({ success: false, message: 'Unauthorized. Please login.' });
   }
 };
+
 
 // ---------- DASHBOARD ---------- //
 exports.getDashboard = async (req, res) => {
