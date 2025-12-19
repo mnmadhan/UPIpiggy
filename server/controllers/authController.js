@@ -17,7 +17,8 @@ exports.signup = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore[email] = otp;
 
-    await sendEmail(email, 'Verify Your Account', `Your OTP is: ${otp}`);
+    await sendOTPEmail(email, username, otp);
+
 
     req.session.tempUser = { email, username, password: hashedPassword };
 
@@ -341,11 +342,14 @@ exports.uploadProfilePicture = async (req, res) => {
 
 // ---------- MIDDLEWARE ---------- //
 // ----------- MIDDLEWARE ----------- //
-export const ensureAuth = (req, res, next) => {
-  if (req.session?.user) { // ✅ Optional chaining for concise, safe access
+// ---------- MIDDLEWARE ---------- //
+exports.ensureAuth = (req, res, next) => {
+  if (req.session && req.session.user) {  // you can also keep ?. if you like
     return next();
   } else {
-    return res.status(401).json({ success: false, message: 'Unauthorized. Please login.' });
+    return res
+      .status(401)
+      .json({ success: false, message: 'Unauthorized. Please login.' });
   }
 };
 

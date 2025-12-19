@@ -168,32 +168,50 @@ async function loadUserProfile(){
 
 
     // -------- Goals --------
-    async function loadGoals(){
-      const list=document.getElementById('goals-list');
-      list.innerHTML='<p>Loading...</p>';
-      try{
-        const res=await fetch('/goals');
-        const data=await res.json();
-        list.innerHTML='';
-        if(data.success && data.goals.length>0){
-          let total=0;
-          data.goals.forEach(goal=>{
-            total+=goal.current_amount;
-            const prog=(goal.current_amount/goal.target_amount)*100;
-            const div=document.createElement('div');
-            div.className='goal-card'+(goal.is_sponsored?' sponsored':'');
-            div.innerHTML=`
-              <h3>${goal.goal_name}${goal.is_sponsored?'<span class="sponsor-badge">Sponsored</span>':''}</h3>
-              <p>Target: ₹${goal.target_amount} • Saved: ₹${goal.current_amount}</p>
-              <div class="progress-bar"><div class="progress" style="width:${prog}%;"></div></div>
-              <div class="goal-actions"><button class="goal-btn add-btn" onclick="goToPayment('${goal.id}','${goal.goal_name}')">Add Funds</button></div>`;
-            list.appendChild(div);
-          });
-          document.getElementById('total-savings').textContent=`₹${total}`;
-          document.getElementById('total-goals').textContent=`Across ${data.goals.length} goals`;
-        }else{list.innerHTML='<p>No goals yet. <a href="#" onclick="openModal(\'addGoal\')">Add one now</a></p>';}
-      }catch(err){console.error('Goals error',err);list.innerHTML='<p>Error loading goals</p>';}
+    async function loadGoals() {
+  const list = document.getElementById('goals-list');
+  list.innerHTML = '<p>Loading...</p>';
+  try {
+    const res = await fetch('/goals');
+    const data = await res.json();
+    list.innerHTML = '';
+
+    if (data.success && data.goals.length > 0) {
+      let total = 0;
+
+      data.goals.forEach(goal => {
+        const current = Number(goal.current_amount) || 0;
+        const target = Number(goal.target_amount) || 0;
+
+        total += current;
+
+        const prog = target > 0 ? (current / target) * 100 : 0;
+
+        const div = document.createElement('div');
+        div.className = 'goal-card' + (goal.is_sponsored ? ' sponsored' : '');
+        div.innerHTML = `
+          <h3>${goal.goal_name}${goal.is_sponsored ? '<span class="sponsor-badge">Sponsored</span>' : ''}</h3>
+          <p>Target: ₹${target} • Saved: ₹${current}</p>
+          <div class="progress-bar">
+            <div class="progress" style="width:${prog}%;"></div>
+          </div>
+          <div class="goal-actions">
+            <button class="goal-btn add-btn" onclick="goToPayment('${goal.id}','${goal.goal_name}')">Add Funds</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+
+      document.getElementById('total-savings').textContent = `₹${total}`;
+      document.getElementById('total-goals').textContent = `Across ${data.goals.length} goals`;
+    } else {
+      list.innerHTML = `<p>No goals yet. <a href="#" onclick="openModal('addGoal')">Add one now</a></p>`;
     }
+  } catch (err) {
+    console.error('Goals error', err);
+    list.innerHTML = '<p>Error loading goals</p>';
+  }
+}
 
     // -------- Sponsored Goals --------
     async function loadSponsoredGoals(){

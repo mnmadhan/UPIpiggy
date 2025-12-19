@@ -2,58 +2,73 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,             // Use 587 for STARTTLS
-  secure: false,         // Use false for STARTTLS
+  service: 'gmail', // ✅ IMPORTANT: use service instead of host/port
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASS, // Gmail App Password
   },
 });
 
-const sendEmail = async (to, subject, text, html) => {
-  const mailOptions = {
-    from: `"UPI Savings Bank" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-    html,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Email sent to ${to}`);
-  } catch (err) {
-    console.error('❌ Error sending email:', err);
+transporter.verify((err) => {
+  if (err) {
+    console.error('❌ Mail service unavailable:', err.message);
+  } else {
+    console.log('✅ Gmail SMTP ready');
   }
-};
+});
 
-const sendSavingsUpdateEmail = async (to, goalName, addedAmount, currentSaved, targetAmount) => {
-  const remaining = targetAmount - currentSaved;
+async function sendEmail(to, subject, text, html) {
+  try {
+    const info = await transporter.sendMail({
+      from: `"UPI Money Bank" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text,
+      html: html || `<p>${text}</p>`,
+    });
 
-  const subject = `₹${addedAmount} added to your ${goalName} goal`;
-  const text = `Hi,
+    console.log('✅ Email sent:', info.messageId);
+    return true;
+  } catch (err) {
+    console.error('❌ Email failed:', err.message);
+    return false;
+  }
+}
 
-₹${addedAmount} has been successfully added to your savings goal: ${goalName}.
+async function sendOTPEmail(email, username, otp) {
+  const ref = Math.random().toString(36).slice(2, 8).toUpperCase();
 
-✅ Current Saved: ₹${currentSaved}
-🎯 Target: ₹${targetAmount}
-📉 Remaining to reach your goal: ₹${remaining}
+  const subject = `Your UPI Money Bank verification code • Ref ${ref}`;
 
-Keep saving! You're getting closer to your dream 🚀`;
+  const text = `Hi ${username || ''},
+
+Your verification code for UPI Money Bank is:
+
+${otp}
+
+This code is valid for a short time.
+
+If you didn't request this, you can safely ignore this email.
+
+Reference ID: ${ref}
+UPI Money Bank`;
 
   const html = `
-    <p>Hi,</p>
-    <p>₹<strong>${addedAmount}</strong> has been successfully added to your savings goal: <strong>${goalName}</strong>.</p>
-    <ul>
-      <li>✅ Current Saved: ₹${currentSaved}</li>
-      <li>🎯 Target: ₹${targetAmount}</li>
-      <li>📉 Remaining to reach your goal: ₹${remaining}</li>
-    </ul>
-    <p>Keep saving! You're getting closer to your dream 🚀</p>
+    <div style="font-family: Arial, sans-serif; max-width:600px;">
+      <h2>UPI Money Bank</h2>
+      <p>Hi ${username || ''},</p>
+      <p>Your verification code is:</p>
+      <h1 style="letter-spacing:4px;">${otp}</h1>
+      <p>This code is valid for a short time.</p>
+      <p>If you didn't request this, please ignore this email.</p>
+      <p style="font-size:12px;color:#666;">Reference ID: ${ref}</p>
+    </div>
   `;
 
-  await sendEmail(to, subject, text, html);
-};
+  return sendEmail(email, subject, text, html);
+}
 
-module.exports = { sendEmail, sendSavingsUpdateEmail };
+module.exports = {
+  sendEmail,
+  sendOTPEmail,
+};
