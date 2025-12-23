@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const crypto = require('crypto');
+const crypto = require('node:crypto');
+
 const transporter = nodemailer.createTransport({
   service: 'gmail', // ✅ IMPORTANT: use service instead of host/port
   auth: {

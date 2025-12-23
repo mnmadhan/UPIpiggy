@@ -2,7 +2,8 @@
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const { sendEmail } = require('../utils/emailService');
-const crypto = require('crypto');
+const crypto = require('node:crypto');
+
 // In-memory OTP storage (⚠️ For production, use Redis or DB)
 let otpStore = {};
 
@@ -344,13 +345,13 @@ exports.uploadProfilePicture = async (req, res) => {
 // ----------- MIDDLEWARE ----------- //
 // ---------- MIDDLEWARE ---------- //
 exports.ensureAuth = (req, res, next) => {
-  if (req.session && req.session.user) {  // you can also keep ?. if you like
+  if (req.session?.user) {
     return next();
-  } else {
-    return res
-      .status(401)
-      .json({ success: false, message: 'Unauthorized. Please login.' });
   }
+
+  return res
+    .status(401)
+    .json({ success: false, message: "Unauthorized. Please login." });
 };
 
 
