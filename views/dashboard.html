@@ -4,294 +4,171 @@
   <meta charset="UTF-8">
   <title>Dashboard - UPI Money Bank</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     :root {
-      --primary: #0066cc;
-      --secondary: #ff9900;
-      --accent: #6633cc;
-      --light: #f9f9f9;
-      --dark: #333;
-      --success: #28a745;
-      --danger: #dc3545;
+      --primary:#0066cc;
+      --secondary:#ff9900;
+      --accent:#6633cc;
+      --success:#28a745;
+      --danger:#dc3545;
     }
-    body {font-family: Arial, sans-serif;margin:0;background:#f0f8ff;color:#333;}
-    header {background:var(--primary);color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.1);}
-    .header-left {display:flex;align-items:center;gap:15px;}
-    .piggy-icon {font-size:32px;color:#ffd700;}
-    header img {border-radius:50%;width:45px;height:45px;object-fit:cover;margin-left:10px;border:2px solid white;}
-    .container {padding:20px;max-width:1200px;margin:0 auto;}
-    .dashboard-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:30px;}
-    .card {background:#fff;border-radius:16px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,.08);}
-    .summary-card {text-align:center;border-top:5px solid var(--primary);}
-    .summary-card h3 {margin-top:0;color:var(--dark);}
-    .amount {font-size:2.2rem;font-weight:bold;color:var(--primary);margin:15px 0;}
-    .actions {display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-top:20px;}
-    .action-btn {background:var(--primary);color:white;border:none;padding:12px;border-radius:12px;cursor:pointer;font-weight:bold;display:flex;flex-direction:column;align-items:center;gap:8px;transition:.3s;}
-    .action-btn:hover {background:var(--accent);transform:translateY(-3px);}
-    .action-btn i {font-size:24px;}
-    .emergency-btn {background:var(--danger);}
-    .emergency-btn:hover {background:#bd2130;}
-    h2 {color:var(--primary);margin:30px 0 20px;position:relative;display:inline-block;}
-    h2:after {content:'';position:absolute;bottom:-10px;left:0;width:50px;height:4px;background:var(--secondary);border-radius:2px;}
-    .goal-card {background:#fff;border-radius:12px;padding:20px;margin:15px 0;box-shadow:0 5px 15px rgba(0,0,0,.08);border-left:5px solid var(--primary);}
-    .sponsored {border-left:5px solid var(--secondary);background:linear-gradient(to right,#fff8e1,white);}
-    .sponsor-badge {background:var(--secondary);color:#fff;padding:5px 10px;border-radius:20px;font-size:12px;margin-left:10px;font-weight:bold;}
-    .progress-bar {height:12px;background:#e9ecef;border-radius:10px;margin:15px 0;overflow:hidden;}
-    .progress {height:100%;background:linear-gradient(to right,var(--primary),var(--accent));border-radius:10px;transition:width .5s;}
-    .goal-actions {display:flex;gap:10px;margin-top:15px;}
-    .goal-btn {padding:8px 15px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
-    .add-btn {background:var(--success);color:white;}
-    .break-glass {position:fixed;bottom:30px;right:30px;width:70px;height:70px;background:var(--danger);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;box-shadow:0 5px 15px rgba(0,0,0,.2);cursor:pointer;z-index:100;animation:pulse 2s infinite;}
-    @keyframes pulse {0%{box-shadow:0 0 0 0 rgba(220,53,69,.7);}70%{box-shadow:0 0 0 15px rgba(220,53,69,0);}100%{box-shadow:0 0 0 0 rgba(220,53,69,0);}}
-    .modal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;}
-    .modal-content {background:#fff;padding:30px;border-radius:16px;width:90%;max-width:500px;box-shadow:0 10px 30px rgba(0,0,0,.2);}
-    .modal h3 {margin-top:0;color:var(--primary);}
-    .form-group {margin-bottom:20px;}
-    .form-group label {display:block;margin-bottom:8px;font-weight:bold;}
-    .form-group input,.form-group select {width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;}
-    .modal-actions {display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
-    .modal-btn {padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
-    .btn-primary {background:var(--primary);color:#fff;}
-    .btn-secondary {background:#6c757d;color:#fff;}
-    @media(max-width:768px){.dashboard-grid{grid-template-columns:1fr;}.actions{grid-template-columns:1fr;}}
+
+    body {font-family:Arial,sans-serif;margin:0;background:#f0f8ff;}
+    header {background:var(--primary);color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;}
+    .piggy-icon{font-size:32px;color:#ffd700}
+    .container{padding:20px;max-width:1200px;margin:auto}
+
+    .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+    .card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,.08)}
+
+    .summary-card{text-align:center;border-top:5px solid var(--primary)}
+    .amount{font-size:2.2rem;font-weight:bold;color:var(--primary)}
+
+    .actions{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+    .action-btn{background:var(--primary);color:#fff;border:none;padding:12px;border-radius:12px;cursor:pointer}
+    .action-btn:hover{background:var(--accent)}
+    .emergency-btn{background:var(--danger)}
+
+    h2{color:var(--primary);margin:30px 0}
+
+    .goal-card{background:#fff;border-radius:12px;padding:20px;margin:15px 0;border-left:5px solid var(--primary)}
+    .sponsored{border-left:5px solid var(--secondary)}
+    .sponsor-badge{background:var(--secondary);color:#fff;padding:4px 10px;border-radius:20px;font-size:12px}
+
+    .progress-bar{height:12px;background:#e9ecef;border-radius:10px;margin:10px 0}
+    .progress{height:100%;background:linear-gradient(to right,var(--primary),var(--accent))}
+
+    /* FIXED: native interactive button */
+    .break-glass-btn{
+      position:fixed;
+      bottom:30px;
+      right:30px;
+      width:70px;
+      height:70px;
+      background:var(--danger);
+      border:none;
+      border-radius:50%;
+      color:#fff;
+      font-size:24px;
+      cursor:pointer;
+      z-index:100;
+    }
+
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center}
+    .modal-content{background:#fff;padding:30px;border-radius:16px;max-width:500px;width:90%}
   </style>
 </head>
+
 <body>
-  <header>
-    <div class="header-left">
-      <i class="fas fa-piggy-bank piggy-icon"></i>
-      <h1>UPI Piggy Bank</h1>
-    </div>
-    <div id="user-info">
-      <span id="user-name"></span>
-      <img id="profile-picture" src="https://ui-avatars.com/api/?name=User&background=0066cc&color=fff" alt="Profile">
-    </div>
-  </header>
-
-  <div class="container">
-    <div class="dashboard-grid">
-      <div class="card summary-card">
-        <h3>Total Savings</h3>
-        <div id="total-savings" class="amount">₹0</div>
-        <p id="total-goals">Across 0 goals</p>
-      </div>
-      
-      <div class="card summary-card">
-        <h3>Emergency Fund</h3>
-        <div id="emergency-fund" class="amount">₹0</div>
-        <p>Break glass in case of emergency</p>
-      </div>
-      
-      <div class="card">
-        <h3>Quick Actions</h3>
-        <div class="actions">
-          <button class="action-btn" onclick="openModal('addGoal')"><i class="fas fa-bullseye"></i><span>Add Goal</span></button>
-          <button class="action-btn" onclick="openModal('addAccount')"><i class="fas fa-university"></i><span>Add Account</span></button>
-          <button class="action-btn" onclick="openPayment()"><i class="fas fa-hand-holding-usd"></i><span>Add Money</span></button>
-          <button class="action-btn emergency-btn" onclick="openModal('emergency')"><i class="fas fa-first-aid"></i><span>Emergency Cash</span></button>
-        </div>
-      </div>
-    </div>
-
-    <h2>Your Goals</h2>
-    <div id="goals-list"><p>Loading goals...</p></div>
-
-    <h2>Sponsored Goals <span class="sponsor-badge">Special Offers</span></h2>
-    <div id="sponsored-goals-list"><p>Loading sponsored goals...</p></div>
+<header>
+  <div>
+    <i class="fas fa-piggy-bank piggy-icon"></i>
+    <strong>UPI Piggy Bank</strong>
   </div>
+  <div>
+    <span id="user-name"></span>
+    <img id="profile-picture" src="https://ui-avatars.com/api/?name=User" width="40">
+  </div>
+</header>
 
-  <div class="break-glass" onclick="openModal('emergency')"><i class="fas fa-first-aid"></i></div>
+<div class="container">
+  <div class="dashboard-grid">
+    <div class="card summary-card">
+      <h3>Total Savings</h3>
+      <div id="total-savings" class="amount">₹0</div>
+      <p id="total-goals">Across 0 goals</p>
+    </div>
 
-  <!-- Add Goal Modal -->
-  <div id="addGoal" class="modal">
-    <div class="modal-content">
-      <h3>Create New Savings Goal</h3>
-      <div class="form-group"><label for="goalName">Goal Name</label><input type="text" id="goalName"></div>
-      <div class="form-group"><label for="targetAmount">Target Amount (₹)</label><input type="number" id="targetAmount"></div>
-      <div class="form-group"><label for="deadline">Target Date</label><input type="date" id="deadline"></div>
-      <div class="modal-actions">
-        <button class="modal-btn btn-secondary" onclick="closeModal('addGoal')">Cancel</button>
-        <button class="modal-btn btn-primary" onclick="createGoal()">Create Goal</button>
+    <div class="card">
+      <h3>Quick Actions</h3>
+      <div class="actions">
+        <button class="action-btn" onclick="openModal('addGoal')">Add Goal</button>
+        <button class="action-btn" onclick="openModal('addAccount')">Add Account</button>
+        <button class="action-btn" onclick="openPayment()">Add Money</button>
+        <button class="action-btn emergency-btn" onclick="openModal('emergency')">Emergency</button>
       </div>
     </div>
   </div>
 
-  <!-- Emergency Modal -->
-  <div id="emergency" class="modal">
-    <div class="modal-content">
-      <h3><i class="fas fa-exclamation-triangle"></i> Emergency Cash Withdrawal</h3>
-      <div class="form-group"><label for="emergencyAmount">Amount Needed (₹)</label><input type="number" id="emergencyAmount"></div>
-      <div class="form-group"><label for="emergencyReason">Reason</label><input type="text" id="emergencyReason"></div>
-      <div class="modal-actions">
-        <button class="modal-btn btn-secondary" onclick="closeModal('emergency')">Cancel</button>
-        <button class="modal-btn btn-primary" onclick="confirmEmergency()">Confirm</button>
-      </div>
-    </div>
-  </div>
+  <h2>Your Goals</h2>
+  <div id="goals-list"><p>Loading goals...</p></div>
 
-  <!-- Add Account Modal -->
-  <div id="addAccount" class="modal">
-    <div class="modal-content">
-      <h3>Link Bank Account</h3>
-      <div class="form-group"><label for="bankName">Bank Name</label><input type="text" id="bankName"></div>
-      <div class="form-group"><label for="accountNumber">Account Number</label><input type="text" id="accountNumber"></div>
-      <div class="form-group"><label for="ifscCode">IFSC Code</label><input type="text" id="ifscCode"></div>
-      <div class="modal-actions">
-        <button class="modal-btn btn-secondary" onclick="closeModal('addAccount')">Cancel</button>
-        <button class="modal-btn btn-primary" onclick="linkAccount()">Link</button>
-      </div>
-    </div>
-  </div>
+  <h2>Sponsored Goals <span class="sponsor-badge">Offers</span></h2>
+  <div id="sponsored-goals-list"><p>Loading sponsored goals...</p></div>
+</div>
 
-  <script>
-    // -------- Modal helpers --------
-    function openModal(id){document.getElementById(id).style.display='flex';}
-    function closeModal(id){document.getElementById(id).style.display='none';}
-    window.onclick=function(e){if(e.target.classList.contains('modal')) e.target.style.display='none';}
+<!-- FIXED: native button instead of div -->
+<button
+  class="break-glass-btn"
+  onclick="openModal('emergency')"
+  aria-label="Emergency cash withdrawal">
+  <i class="fas fa-first-aid"></i>
+</button>
 
-    // -------- Profile --------
-    // -------- Profile --------
-async function loadUserProfile(){
-  try{
-    const res=await fetch('/profile');
-    const data=await res.json();
-    if(data.success){
-      document.getElementById('user-name').textContent=data.user.full_name || data.user.username;
-      if(data.user.profile_picture){
-        document.getElementById('profile-picture').src=data.user.profile_picture;
+<script>
+  function openModal(id){
+    document.getElementById(id).style.display='flex';
+  }
+  function closeModal(id){
+    document.getElementById(id).style.display='none';
+  }
+
+  globalThis.addEventListener('click', e=>{
+    if(e.target.classList.contains('modal')){
+      e.target.style.display='none';
+    }
+  });
+
+  async function loadUserProfile(){
+    try{
+      const res=await fetch('/profile');
+      const data=await res.json();
+      if(data.success){
+        document.getElementById('user-name').textContent =
+          data.user.full_name || data.user.username;
       }
-    }
-  }catch(err){
-    console.error('Profile error', err);
+    }catch(e){console.error(e);}
   }
-}
 
-
-    // -------- Goals --------
-    async function loadGoals() {
-  const list = document.getElementById('goals-list');
-  list.innerHTML = '<p>Loading...</p>';
-  try {
-    const res = await fetch('/goals');
-    const data = await res.json();
-    list.innerHTML = '';
-
-    if (data.success && data.goals.length > 0) {
-      let total = 0;
-
-      data.goals.forEach(goal => {
-        const current = Number(goal.current_amount) || 0;
-        const target = Number(goal.target_amount) || 0;
-
-        total += current;
-
-        const prog = target > 0 ? (current / target) * 100 : 0;
-
-        const div = document.createElement('div');
-        div.className = 'goal-card' + (goal.is_sponsored ? ' sponsored' : '');
-        div.innerHTML = `
-          <h3>${goal.goal_name}${goal.is_sponsored ? '<span class="sponsor-badge">Sponsored</span>' : ''}</h3>
-          <p>Target: ₹${target} • Saved: ₹${current}</p>
-          <div class="progress-bar">
-            <div class="progress" style="width:${prog}%;"></div>
-          </div>
-          <div class="goal-actions">
-            <button class="goal-btn add-btn" onclick="goToPayment('${goal.id}','${goal.goal_name}')">Add Funds</button>
-          </div>
-        `;
-        list.appendChild(div);
-      });
-
-      document.getElementById('total-savings').textContent = `₹${total}`;
-      document.getElementById('total-goals').textContent = `Across ${data.goals.length} goals`;
-    } else {
-      list.innerHTML = `<p>No goals yet. <a href="#" onclick="openModal('addGoal')">Add one now</a></p>`;
-    }
-  } catch (err) {
-    console.error('Goals error', err);
-    list.innerHTML = '<p>Error loading goals</p>';
+  async function loadGoals(){
+    const list=document.getElementById('goals-list');
+    try{
+      const res=await fetch('/goals');
+      const data=await res.json();
+      list.innerHTML='';
+      if(data.success){
+        let total=0;
+        data.goals.forEach(g=>{
+          total+=Number(g.current_amount)||0;
+          const div=document.createElement('div');
+          div.className='goal-card';
+          div.innerHTML=`<h3>${g.goal_name}</h3>`;
+          list.appendChild(div);
+        });
+        document.getElementById('total-savings').textContent=`₹${total}`;
+      }
+    }catch(e){console.error(e);}
   }
-}
 
-    // -------- Sponsored Goals --------
-    async function loadSponsoredGoals(){
-      const list=document.getElementById('sponsored-goals-list');
-      list.innerHTML='<p>Loading...</p>';
-      try{
-        const res=await fetch('/sponsored-goals');
-        const data=await res.json();
-        list.innerHTML='';
-        if(data.success && data.sponsoredGoals.length>0){
-          data.sponsoredGoals.forEach(goal=>{
-            const div=document.createElement('div');
-            div.className='goal-card sponsored';
-            div.innerHTML=`
-              <h3>${goal.goal_name} <span class="sponsor-badge">Sponsor</span></h3>
-              <p>Target: ₹${goal.target_amount}</p>
-              <p><strong>Benefits:</strong> ${goal.sponsor_benefits||'Special reward upon completion'}</p>
-              <div class="goal-actions"><button class="goal-btn add-btn" onclick="selectSponsoredGoal('${goal.goal_name}',${goal.target_amount})">Select</button></div>`;
-            list.appendChild(div);
-          });
-        }else{list.innerHTML='<p>No sponsored goals right now.</p>';}
-      }catch(err){console.error('Sponsored error',err);list.innerHTML='<p>Error loading sponsored goals</p>';}
-    }
+  async function loadSponsoredGoals(){
+    try{
+      const res=await fetch('/sponsored-goals');
+      const data=await res.json();
+      document.getElementById('sponsored-goals-list').innerHTML =
+        data.success ? '' : '<p>No sponsored goals</p>';
+    }catch(e){console.error(e);}
+  }
 
-    // -------- Create goal --------
-    async function createGoal(){
-      const name=document.getElementById('goalName').value.trim();
-      const target=document.getElementById('targetAmount').value;
-      const deadline=document.getElementById('deadline').value;
-      if(!name||!target){alert('Fill all fields');return;}
-      try{
-        const res=await fetch('/goals',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({goal_name:name,target_amount:target,deadline})});
-        const data=await res.json();
-        if(data.success){closeModal('addGoal');loadGoals();}
-        else alert(data.message||'Error creating goal');
-      }catch(err){console.error('Create goal error',err);}
-    }
+  function openPayment(){
+    alert('Select a goal first');
+  }
 
-    // -------- Select sponsored goal --------
-    async function selectSponsoredGoal(name,target){
-      try{
-        const res=await fetch('/sponsored-goals/select',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({goal_name:name,target_amount:target})});
-        const data=await res.json();
-        if(data.success){alert('Sponsored goal added to your goals!');loadGoals();}
-      }catch(err){console.error('Select sponsored goal error',err);}
-    }
-
-    // -------- Payment --------
-    function goToPayment(goalId,goalName){
-      localStorage.setItem('selectedGoalId',goalId);
-      localStorage.setItem('selectedGoalName',goalName);
-      window.location.href='/payment.html';
-    }
-    function openPayment(){
-      alert('Please select a goal first from Your Goals list to add funds.');
-    }
-
-    // -------- Emergency --------
-    function confirmEmergency(){
-      const amt=document.getElementById('emergencyAmount').value;
-      const reason=document.getElementById('emergencyReason').value.trim();
-      if(!amt||!reason){alert('Please fill amount and reason');return;}
-      alert(`Emergency withdrawal request: ₹${amt} for ${reason}`);
-      closeModal('emergency');
-    }
-
-    // -------- Link account --------
-    function linkAccount(){
-      const bank=document.getElementById('bankName').value.trim();
-      const acc=document.getElementById('accountNumber').value.trim();
-      const ifsc=document.getElementById('ifscCode').value.trim();
-      if(!bank||!acc||!ifsc){alert('Fill all fields');return;}
-      alert(`Account ${acc} linked with ${bank}`);
-      closeModal('addAccount');
-    }
-    
-    // Init
-    loadUserProfile();
-    loadGoals();
-    loadSponsoredGoals();
-  </script>
+  /* INIT – correct for non-module scripts */
+  loadUserProfile();
+  loadGoals();
+  loadSponsoredGoals();
+</script>
 </body>
 </html>
