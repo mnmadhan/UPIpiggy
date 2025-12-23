@@ -17,12 +17,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Sessions
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key', // Use env in production
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // true only if HTTPS
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'strict'
+    }
   })
 );
+
 
 // Static files (CSS, JS, images)
 app.use(express.static(path.join(__dirname, 'public')));
