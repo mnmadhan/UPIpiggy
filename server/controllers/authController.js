@@ -2,7 +2,7 @@
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const { sendEmail } = require('../utils/emailService');
-
+const crypto = require('crypto');
 // In-memory OTP storage (⚠️ For production, use Redis or DB)
 let otpStore = {};
 
@@ -128,7 +128,7 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = crypto.randomInt(100000, 999999).toString();
     otpStore[email] = otp;
 
     await sendEmail(email, 'Password Reset OTP', `Your OTP is: ${otp}`);

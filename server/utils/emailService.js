@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-
+const crypto = require('crypto');
 const transporter = nodemailer.createTransport({
   service: 'gmail', // ✅ IMPORTANT: use service instead of host/port
   auth: {
@@ -36,7 +36,7 @@ async function sendEmail(to, subject, text, html) {
 }
 
 async function sendOTPEmail(email, username, otp) {
-  const ref = Math.random().toString(36).slice(2, 8).toUpperCase();
+  const ref = crypto.randomBytes(3).toString('hex').toUpperCase();
 
   const subject = `Your UPI Money Bank verification code • Ref ${ref}`;
 
