@@ -1,79 +1,90 @@
-const db = require('../db');
-const { sendEmail } = require('../utils/emailService');
+const db = require("../db");
+const emailService = require("../utils/emailService");
 
-// ---------- PROCESS PAYMENT ---------- //
-exports.processPayment = async (req, res) => {
+/* ===============================
+   ✅ MAKE PAYMENT + ADD TO GOAL
+================================ */
+exports.makePayment = async (req, res) => {
+  const { goalId, amount, method } = req.body;
+  const userId = req.session.user.id;
+  const userEmail = req.session.user.email;
+
+  if (!goalId || !amount || amount <= 0) {
+    return res.status(400).send("Invalid payment details");
+  }
+
+  if (!method) {
+    return res.status(400).send("Payment method required");
+  }
+
   try {
-    if (!req.session.user) {
-      return res.status(401).json({ success: false, message: 'Unauthorized' });
-    }
-
-    const userId = req.session.user.id;
-    const { amount, method, goal_id } = req.body;
-
-    // Check goal exists and belongs to user
+    /* ===============================
+       ✅ CHECK GOAL BELONGS TO USER
+    ================================ */
     const goalResult = await db.query(
-      `SELECT * FROM savings_goals WHERE id = $1 AND user_id = $2`,
-      [goal_id, userId]
+      "SELECT * FROM savings_goals WHERE id = $1 AND user_id = $2",
+      [goalId, userId]
     );
 
     if (goalResult.rows.length === 0) {
-      return res.status(400).json({ success: false, message: 'Goal not found.' });
+      return res.status(404).send("Goal not found");
     }
 
     const goal = goalResult.rows[0];
 
-    // Insert payment
-    const paymentResult = await db.query(
-      `INSERT INTO payments (user_id, amount, method, goal_id) 
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [userId, amount, method, goal_id]
-    );
-    const payment = paymentResult.rows[0];
+    /* ===============================
+       ✅ BEGIN TRANSACTION
+    ================================ */
+    await db.query("BEGIN");
 
-    // Update savings goal
+    /* ===============================
+       ✅ INSERT PAYMENT RECORD
+    ================================ */
     await db.query(
-      `UPDATE savings_goals 
-       SET current_amount = current_amount + $1 
-       WHERE id = $2`,
-      [amount, goal_id]
+      `INSERT INTO payments (user_id, goal_id, amount, method, status)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [userId, goalId, amount, method, "SUCCESS"]
     );
 
-    // Send email notification
-    await sendEmail(
-      req.session.user.email,
-      'Savings Updated',
-      `₹${amount} has been added to your goal "${goal.goal_name}".`
+    /* ===============================
+       ✅ UPDATE GOAL CURRENT AMOUNT
+    ================================ */
+    await db.query(
+      `UPDATE savings_goals
+       SET current_amount = current_amount + $1
+       WHERE id = $2 AND user_id = $3`,
+      [amount, goalId, userId]
     );
 
-    res.json({ success: true, message: 'Payment processed successfully.', payment });
+    /* ===============================
+       ✅ COMMIT TRANSACTION
+    ================================ */
+    await db.query("COMMIT");
+
+    /* ===============================
+       ✅ EMAIL NOTIFICATION
+    ================================ */
+    await emailService.sendEmail(
+      userEmail,
+      "Payment Successful 💳",
+      `You paid ₹${amount} using ${method} towards your savings goal.`,
+      `
+        <h2>Payment Successful 🎉</h2>
+        <p><b>Goal:</b> ${goal.goal_name}</p>
+        <p><b>Amount:</b> ₹${amount}</p>
+        <p><b>Method:</b> ${method}</p>
+        <p>Your savings goal has been updated successfully.</p>
+      `
+    );
+
+    res.redirect("/dashboard");
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Error processing payment.' });
-  }
-};
+    console.error("Payment Error:", err);
 
-// ---------- GET USER PAYMENTS ---------- //
-exports.getPayments = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.status(401).json({ success: false, message: 'Unauthorized' });
-    }
+    // Rollback
+    await db.query("ROLLBACK");
 
-    const userId = req.session.user.id;
-
-    const result = await db.query(
-      `SELECT p.id, p.amount, p.method, p.created_at, g.goal_name
-       FROM payments p
-       LEFT JOIN savings_goals g ON p.goal_id = g.id
-       WHERE p.user_id = $1
-       ORDER BY p.created_at DESC`,
-      [userId]
-    );
-
-    res.json({ success: true, payments: result.rows });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Error fetching payments.' });
+    res.status(500).send("Payment failed. Please try again.");
   }
 };

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OTP Verification - UPI Money Bank</title>
-  <link rel="stylesheet" href="/css/styles.css">
+
   <style>
     body {
       display: flex;
@@ -15,6 +15,7 @@
       background: #f0f2f5;
       font-family: Arial, sans-serif;
     }
+
     .otp-container {
       background: #fff;
       padding: 30px;
@@ -22,23 +23,21 @@
       box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 400px;
-    }
-    .otp-container h2 {
-      margin-bottom: 20px;
       text-align: center;
-      color: #333;
     }
-    .otp-container input {
+
+    input {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-size: 16px;
+      font-size: 18px;
       text-align: center;
       letter-spacing: 4px;
     }
-    .otp-container button {
+
+    button {
       width: 100%;
       padding: 12px;
       margin-top: 15px;
@@ -48,32 +47,40 @@
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-    .otp-container button:hover {
+
+    button:hover {
       background: #0056b3;
     }
+
     #msg {
       margin-top: 15px;
-      text-align: center;
       font-size: 14px;
     }
   </style>
 </head>
+
 <body>
+
   <div class="otp-container">
-    <h2>Verify OTP</h2>
+    <h2>🔐 Verify OTP</h2>
+
     <form id="otpForm">
-      <input type="text" id="otp" name="otp" placeholder="Enter OTP" required maxlength="6" />
+      <input type="text" id="otp" placeholder="Enter OTP" required maxlength="6" />
       <button type="submit">Verify OTP</button>
     </form>
+
     <div id="msg"></div>
   </div>
 
   <script>
     document.getElementById("otpForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const otp = document.getElementById("otp").value.trim();
+      const msg = document.getElementById("msg");
+
+      msg.innerHTML = "⏳ Verifying OTP...";
 
       try {
         const res = await fetch("/verify-otp", {
@@ -81,20 +88,27 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ otp })
         });
+
         const data = await res.json();
-        const msg = document.getElementById("msg");
 
         if (data.success) {
           msg.innerHTML = `<p style="color:green;">✅ ${data.message}</p>`;
-          setTimeout(() => window.location.href = "/complete-profile", 1200);
+
+          // ✅ Redirect to Dashboard
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 1200);
+
         } else {
           msg.innerHTML = `<p style="color:red;">❌ ${data.message}</p>`;
         }
+
       } catch (err) {
         console.error(err);
-        document.getElementById("msg").innerHTML = `<p style="color:red;">Something went wrong!</p>`;
+        msg.innerHTML = `<p style="color:red;">Something went wrong!</p>`;
       }
     });
   </script>
+
 </body>
 </html>

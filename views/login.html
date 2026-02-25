@@ -3,106 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - UPI Money Bank</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <title>Login - UPI Savings Bank</title>
+
   <style>
     body {
+      margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      background: #f0f2f5;
       font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #007bff, #00c6ff);
     }
-    .login-container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    .login-container h2 {
-      margin-bottom: 20px;
+
+    .login-box {
+      width: 400px;
+      background: white;
+      padding: 35px;
+      border-radius: 15px;
       text-align: center;
-      color: #333;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.25);
     }
-    .login-container input {
+
+    h2 {
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    input {
       width: 100%;
       padding: 12px;
-      margin: 10px 0;
+      margin: 12px 0;
+      border-radius: 10px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+      font-size: 15px;
     }
-    .login-container button {
+
+    button {
       width: 100%;
       padding: 12px;
-      margin-top: 15px;
-      background: #007bff;
-      color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      background: #007bff;
+      color: white;
       font-size: 16px;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-    .login-container button:hover {
+
+    button:hover {
       background: #0056b3;
     }
-    .login-container p {
+
+    p {
       margin-top: 15px;
-      text-align: center;
-      font-size: 14px;
     }
-    .login-container a {
+
+    a {
       color: #007bff;
       text-decoration: none;
-    }
-    .login-container a:hover {
-      text-decoration: underline;
+      font-weight: bold;
     }
   </style>
 </head>
+
 <body>
-  <div class="login-container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <input type="text" name="identifier" placeholder="Username or Email" required>
-      <input type="password" name="password" placeholder="Password" required>
+
+  <div class="login-box">
+    <h2>🏦 Login</h2>
+
+    <!-- ✅ Classic Form Login -->
+    <form action="/login" method="POST">
+
+      <input
+        type="text"
+        name="loginId"
+        placeholder="Email or Username"
+        required
+      />
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        required
+      />
+
       <button type="submit">Login</button>
     </form>
-    <p>Don’t have an account? <a href="/signup">Sign up</a></p>
-    <p><a href="/forgot-password">Forgot Password?</a></p>
-    <div id="msg"></div>
+
+    <p>New user? <a href="/signup">Signup</a></p>
   </div>
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = Object.fromEntries(new FormData(e.target).entries());
-
-      try {
-        const res = await fetch("/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData)
-        });
-        const data = await res.json();
-        const msg = document.getElementById("msg");
-
-        if (data.success) {
-          msg.innerHTML = `<p style="color:green;">${data.message}</p>`;
-          setTimeout(() => window.location.href = "/dashboard", 1200);
-        } else {
-          msg.innerHTML = `<p style="color:red;">${data.message}</p>`;
-        }
-      } catch (err) {
-        console.error(err);
-        document.getElementById("msg").innerHTML = `<p style="color:red;">Something went wrong</p>`;
-      }
-    });
-  </script>
 </body>
 </html>

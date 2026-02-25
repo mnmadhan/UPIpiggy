@@ -1,96 +1,111 @@
-const express = require('express');
-const path = require('node:path');
+const express = require("express");
+const path = require("path");
+const db = require("./db");
+
 const router = express.Router();
-const pool = require('./db'); // ✅ make sure you import your db pool
 
-// Controllers
-const authController = require('./controllers/authController');
-const paymentController = require('./controllers/paymentController');
+const authController = require("./controllers/authController");
+const paymentController = require("./controllers/paymentController");
+const adminController = require("./controllers/adminController");
 
-// ---------------- STATIC PAGES (Frontend Views) ----------------
-router.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/index.html'));
-});
-
-router.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/login.html'));
-});
-
-router.get('/signup', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/signup.html'));
-});
-
-router.get('/otp', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/otp.html'));
-});
-
-router.get('/dashboard', authController.ensureAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/dashboard.html'));
-});
-
-router.get('/payment', authController.ensureAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/payment.html'));
-});
-
-// ---------------- PROFILE (API) ----------------
-// Get logged in user profile
-router.get('/profile', (req, res) => {
+/* ===============================
+   LOGIN CHECK
+================================ */
+function isLoggedIn(req, res, next) {
   if (!req.session.user) {
-    return res.status(401).json({ success: false, message: 'Not logged in' });
+    return res.redirect("/login");
   }
-  res.json({ success: true, user: req.session.user });
+  next();
+}
+
+/* ===============================
+   ADMIN CHECK
+================================ */
+function isAdmin(req, res, next) {
+  if (!req.session.user || req.session.user.role !== "admin") {
+    return res.status(403).send("Admins only");
+  }
+  next();
+}
+
+/* ===============================
+   AUTH ROUTES
+================================ */
+router.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/login.html"));
+});
+
+router.get("/signup", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/signup.html"));
+});
+
+router.get("/otp", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/otp.html"));
+});
+
+router.post("/signup", authController.signup);
+router.post("/verify-otp", authController.verifyOtp);
+router.post("/login", authController.login);
+router.get("/logout", authController.logout);
+
+/* ===============================
+   ✅ LOGGED USER INFO API
+================================ */
+router.get("/api/user", isLoggedIn, (req, res) => {
+  res.json({
+    username: req.session.user.username,
+    email: req.session.user.email
+  });
 });
 
 
-// ✅ NEW: Complete Profile page (after signup)
-router.get('/complete-profile', authController.ensureAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/complete-profile.html'));
+/* ===============================
+   DASHBOARD ROUTES
+================================ */
+router.get("/dashboard", isLoggedIn, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/dashboard.html"));
 });
 
-// ---------------- AUTH ROUTES ----------------
-router.post('/signup', authController.signup);
-router.post('/verify-otp', authController.verifyOtp);
-router.post('/login', authController.login); // ⚡ inside this, set req.session.userId = user.id
-router.get('/logout', authController.logout);
+/* ✅ Add Goal Route */
+router.post("/add-goal", isLoggedIn, authController.addGoal);
 
-// ---------------- COMPLETE PROFILE ----------------
-router.post('/complete-profile', authController.ensureAuth, authController.completeProfile);
+/* ✅ Add Savings Route */
+router.post("/add-savings", isLoggedIn, authController.addSavings);
 
-// ---------------- SAVINGS GOALS ----------------
-router.post('/goals', authController.ensureAuth, authController.createGoal);
-router.get('/goals', authController.ensureAuth, authController.getGoals);
-router.post('/goals/:id/add', authController.ensureAuth, authController.addToGoal);
+/* API Goals */
+router.get("/api/goals", isLoggedIn, async (req, res) => {
+  const result = await db.query(
+    "SELECT * FROM savings_goals WHERE user_id = $1",
+    [req.session.user.id]
+  );
 
-// ---------------- PAYMENTS ----------------
-router.post('/payment', authController.ensureAuth, paymentController.processPayment);
-
-// ---------------- PROFILE UPDATE ----------------
-router.post('/profile/upload', authController.ensureAuth, authController.uploadProfilePicture);
-router.post('/profile/update', authController.ensureAuth, authController.updateProfile);
-
-// ---------------- FORGOT / RESET PASSWORD ----------------
-router.get('/forgot-password', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/forgot-password.html'));
+  res.json(result.rows);
 });
 
-router.get('/reset-password', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/reset-password.html'));
+/* ===============================
+   PAYMENT ROUTES
+================================ */
+router.get("/payment", isLoggedIn, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/payment.html"));
 });
 
-router.post('/forgot-password', authController.forgotPassword);
-router.post('/reset-password', authController.resetPassword);
+router.post("/payment", isLoggedIn, paymentController.makePayment);
 
-// ---------------- SPONSORED GOALS ----------------
-router.get('/sponsored-goals', (req, res) => {
-  // 🔥 Match fields with dashboard.html expectations
-  const sponsoredGoals = [
-    { id: 1, goal_name: "Buy a Bike", target_amount: 20000, sponsor_benefits: "Discount on accessories" },
-    { id: 2, goal_name: "iPhone 16 Pro", target_amount: 120000, sponsor_benefits: "Cashback on purchase" },
-    { id: 3, goal_name: "Goa Trip", target_amount: 30000, sponsor_benefits: "Travel vouchers included" }
-  ];
-  res.json({ success: true, sponsoredGoals });
+/* ===============================
+   ADMIN ROUTES
+================================ */
+router.get("/admin", isLoggedIn, isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/admin.html"));
 });
 
-router.post('/sponsored-goals/select', authController.ensureAuth, authController.selectSponsoredGoal);
+router.get("/admin/users", isLoggedIn, isAdmin, adminController.getAllUsers);
+router.get("/admin/payments", isLoggedIn, isAdmin, adminController.getAllPayments);
+
+/* ===============================
+   HOME ROUTE
+================================ */
+router.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/index.html"));
+});
 
 module.exports = router;

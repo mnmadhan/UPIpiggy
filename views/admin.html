@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard | UPI Money Bank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/css/admin.css" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="admin-header">
+  <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+  <button onclick="logoutAdmin()">Logout</button>
+</header>
+
+<!-- ===== MAIN ===== -->
+<div class="admin-container">
+
+  <!-- ===== ADD SPONSORED GOAL ===== -->
+  <section class="card">
+    <h2>Add Sponsored Goal</h2>
+
+    <input id="goalName" placeholder="Goal name" />
+    <input id="targetAmount" type="number" placeholder="Target amount" />
+    <textarea id="benefits" placeholder="Sponsor benefits"></textarea>
+    <input id="imageUrl" placeholder="Image URL (optional)" />
+
+    <button onclick="addSponsoredGoal()">Add Goal</button>
+  </section>
+
+  <!-- ===== SPONSORED GOALS LIST ===== -->
+  <section class="card">
+    <h2>Sponsored Goals</h2>
+    <div id="sponsoredGoals">Loading...</div>
+  </section>
+
+  <!-- ===== WITHDRAWAL REQUESTS ===== -->
+  <section class="card">
+    <h2>Withdrawal Requests</h2>
+    <div id="withdrawals">Coming soon…</div>
+  </section>
+
+</div>
+
+<script>
+/* ================= ADD SPONSORED GOAL ================= */
+async function addSponsoredGoal() {
+  const goal_name = goalName.value.trim();
+  const target_amount = targetAmount.value;
+  const sponsor_benefits = benefits.value.trim();
+  const image_url = imageUrl.value.trim();
+
+  if (!goal_name || !target_amount) {
+    alert('Goal name & target amount required');
+    return;
+  }
+
+  const res = await fetch('/admin/sponsored-goals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      goal_name,
+      target_amount,
+      sponsor_benefits,
+      image_url
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert('Sponsored goal added');
+    goalName.value = '';
+    targetAmount.value = '';
+    benefits.value = '';
+    imageUrl.value = '';
+    loadSponsoredGoals();
+  } else {
+    alert(data.message || 'Error');
+  }
+}
+
+/* ================= LOAD SPONSORED GOALS ================= */
+async function loadSponsoredGoals() {
+  const box = document.getElementById('sponsoredGoals');
+  box.innerHTML = 'Loading...';
+
+  const res = await fetch('/admin/sponsored-goals');
+  const data = await res.json();
+
+  if (!data.success || data.sponsoredGoals.length === 0) {
+    box.innerHTML = '<p>No sponsored goals</p>';
+    return;
+  }
+
+  box.innerHTML = '';
+
+  data.sponsoredGoals.forEach(g => {
+    box.innerHTML += `
+      <div class="goal-row">
+        <div>
+          <strong>${g.goal_name}</strong><br>
+          ₹${g.target_amount}<br>
+          <small>${g.sponsor_benefits || ''}</small>
+        </div>
+        <span class="${g.is_active ? 'active' : 'inactive'}">
+          ${g.is_active ? 'ACTIVE' : 'INACTIVE'}
+        </span>
+      </div>
+    `;
+  });
+}
+
+/* ================= LOGOUT ================= */
+async function logoutAdmin() {
+  await fetch('/admin/logout');
+  location.href = '/';
+}
+
+/* INIT */
+loadSponsoredGoals();
+</script>
+
+</body>
+</html>
