@@ -4,13 +4,52 @@
   <meta charset="UTF-8" />
   <title>Admin Dashboard | UPI Money Bank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link rel="stylesheet" href="/css/admin.css" />
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* login overlay */
+    #loginOverlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 999;
+    }
+    #loginBox {
+      background: #1f2937;
+      padding: 40px 35px;
+      border-radius: 20px;
+      width: 360px;
+      color: white;
+      text-align: center;
+    }
+    #loginBox input {
+      width: 100%; padding: 12px; margin: 10px 0;
+      border-radius: 10px; border: none;
+      background: #374151; color: white; font-size: 14px;
+      box-sizing: border-box;
+    }
+    #loginBox button {
+      width: 100%; padding: 12px; margin-top: 12px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border: none; border-radius: 10px;
+      color: white; font-size: 15px; font-weight: bold; cursor: pointer;
+    }
+    #loginErr { color: #f87171; margin-top: 10px; font-size: 13px; }
+  </style>
 </head>
-
 <body>
+
+<!-- FIX: Admin panel now requires login before showing content -->
+<div id="loginOverlay">
+  <div id="loginBox">
+    <h2><i class="fas fa-shield-alt"></i> Admin Login</h2>
+    <input id="adminUser" type="text"     placeholder="Username" />
+    <input id="adminPass" type="password" placeholder="Password" />
+    <button onclick="doAdminLogin()">Login</button>
+    <div id="loginErr"></div>
+  </div>
+</div>
 
 <!-- ===== HEADER ===== -->
 <header class="admin-header">
@@ -24,12 +63,9 @@
   <!-- ===== ADD SPONSORED GOAL ===== -->
   <section class="card">
     <h2>Add Sponsored Goal</h2>
-
-    <input id="goalName" placeholder="Goal name" />
+    <input id="goalName"     placeholder="Goal name" />
     <input id="targetAmount" type="number" placeholder="Target amount" />
-    <textarea id="benefits" placeholder="Sponsor benefits"></textarea>
-    <input id="imageUrl" placeholder="Image URL (optional)" />
-
+    <textarea id="benefits"  placeholder="Description (optional)"></textarea>
     <button onclick="addSponsoredGoal()">Add Goal</button>
   </section>
 
@@ -39,91 +75,178 @@
     <div id="sponsoredGoals">Loading...</div>
   </section>
 
-  <!-- ===== WITHDRAWAL REQUESTS ===== -->
+  <!-- ===== ALL USERS ===== -->
   <section class="card">
-    <h2>Withdrawal Requests</h2>
-    <div id="withdrawals">Coming soon…</div>
+    <h2>All Users</h2>
+    <div id="usersList">Loading...</div>
+  </section>
+
+  <!-- ===== ALL PAYMENTS ===== -->
+  <section class="card">
+    <h2>All Payments</h2>
+    <div id="paymentsList">Loading...</div>
   </section>
 
 </div>
 
 <script>
-/* ================= ADD SPONSORED GOAL ================= */
-async function addSponsoredGoal() {
-  const goal_name = goalName.value.trim();
-  const target_amount = targetAmount.value;
-  const sponsor_benefits = benefits.value.trim();
-  const image_url = imageUrl.value.trim();
+/* ================= ADMIN LOGIN ================= */
+async function doAdminLogin() {
+  const username = document.getElementById("adminUser").value.trim();
+  const password = document.getElementById("adminPass").value;
+  const err      = document.getElementById("loginErr");
 
-  if (!goal_name || !target_amount) {
-    alert('Goal name & target amount required');
-    return;
-  }
-
-  const res = await fetch('/admin/sponsored-goals', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      goal_name,
-      target_amount,
-      sponsor_benefits,
-      image_url
-    })
+  // FIX: correct route is /admin/login
+  const res  = await fetch("/admin/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
   });
-
   const data = await res.json();
 
   if (data.success) {
-    alert('Sponsored goal added');
-    goalName.value = '';
-    targetAmount.value = '';
-    benefits.value = '';
-    imageUrl.value = '';
+    document.getElementById("loginOverlay").style.display = "none";
+    loadAll();
+  } else {
+    err.innerText = data.message || "Login failed";
+  }
+}
+
+/* ================= ADD SPONSORED GOAL ================= */
+async function addSponsoredGoal() {
+  const goal_name     = goalName.value.trim();
+  const target_amount = targetAmount.value;
+  const description   = benefits.value.trim();
+
+  if (!goal_name || !target_amount) {
+    alert("Goal name & target amount required");
+    return;
+  }
+
+  // FIX: correct route is /admin/sponsored-goals
+  const res  = await fetch("/admin/sponsored-goals", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ goal_name, target_amount, description })
+  });
+  const data = await res.json();
+
+  if (data.success) {
+    goalName.value     = "";
+    targetAmount.value = "";
+    benefits.value     = "";
     loadSponsoredGoals();
   } else {
-    alert(data.message || 'Error');
+    alert(data.message || "Error");
   }
 }
 
 /* ================= LOAD SPONSORED GOALS ================= */
 async function loadSponsoredGoals() {
-  const box = document.getElementById('sponsoredGoals');
-  box.innerHTML = 'Loading...';
+  const box = document.getElementById("sponsoredGoals");
 
-  const res = await fetch('/admin/sponsored-goals');
+  // FIX: correct route is /admin/sponsored-goals
+  const res  = await fetch("/admin/sponsored-goals");
   const data = await res.json();
 
   if (!data.success || data.sponsoredGoals.length === 0) {
-    box.innerHTML = '<p>No sponsored goals</p>';
+    box.innerHTML = "<p>No sponsored goals yet.</p>";
     return;
   }
 
-  box.innerHTML = '';
-
-  data.sponsoredGoals.forEach(g => {
-    box.innerHTML += `
-      <div class="goal-row">
-        <div>
-          <strong>${g.goal_name}</strong><br>
-          ₹${g.target_amount}<br>
-          <small>${g.sponsor_benefits || ''}</small>
-        </div>
-        <span class="${g.is_active ? 'active' : 'inactive'}">
-          ${g.is_active ? 'ACTIVE' : 'INACTIVE'}
-        </span>
+  box.innerHTML = data.sponsoredGoals.map(g => `
+    <div class="goal-row">
+      <div>
+        <strong>${g.goal_name}</strong><br>
+        ₹${g.target_amount}<br>
+        <small>${g.description || ""}</small>
       </div>
-    `;
-  });
+    </div>
+  `).join("");
+}
+
+/* ================= LOAD USERS ================= */
+async function loadUsers() {
+  const box = document.getElementById("usersList");
+
+  // FIX: correct route is /admin/users
+  const res  = await fetch("/admin/users");
+  const rows = await res.json();
+
+  if (!rows.length) { box.innerHTML = "<p>No users.</p>"; return; }
+
+  box.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:rgba(255,255,255,0.1);">
+          <th style="padding:8px;text-align:left;">ID</th>
+          <th style="padding:8px;text-align:left;">Username</th>
+          <th style="padding:8px;text-align:left;">Email</th>
+          <th style="padding:8px;text-align:left;">Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(u => `
+          <tr>
+            <td style="padding:8px;">${u.id}</td>
+            <td style="padding:8px;">${u.username}</td>
+            <td style="padding:8px;">${u.email}</td>
+            <td style="padding:8px;">${u.role}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+/* ================= LOAD PAYMENTS ================= */
+async function loadPayments() {
+  const box = document.getElementById("paymentsList");
+
+  // FIX: correct route is /admin/payments
+  const res  = await fetch("/admin/payments");
+  const rows = await res.json();
+
+  if (!rows.length) { box.innerHTML = "<p>No payments.</p>"; return; }
+
+  box.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:rgba(255,255,255,0.1);">
+          <th style="padding:8px;text-align:left;">User</th>
+          <th style="padding:8px;text-align:left;">Goal</th>
+          <th style="padding:8px;text-align:left;">Amount</th>
+          <th style="padding:8px;text-align:left;">Method</th>
+          <th style="padding:8px;text-align:left;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(p => `
+          <tr>
+            <td style="padding:8px;">${p.username}</td>
+            <td style="padding:8px;">${p.goal_name}</td>
+            <td style="padding:8px;">₹${p.amount}</td>
+            <td style="padding:8px;">${p.method}</td>
+            <td style="padding:8px;">${p.status}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
 }
 
 /* ================= LOGOUT ================= */
 async function logoutAdmin() {
-  await fetch('/admin/logout');
-  location.href = '/';
+  // FIX: correct route is /admin/logout
+  await fetch("/admin/logout");
+  location.href = "/";
 }
 
-/* INIT */
-loadSponsoredGoals();
+function loadAll() {
+  loadSponsoredGoals();
+  loadUsers();
+  loadPayments();
+}
 </script>
 
 </body>

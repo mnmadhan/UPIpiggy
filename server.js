@@ -4,25 +4,26 @@ const path = require("path");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 dotenv.config();
 
 const app = express();
 
 /* ===============================
-   ✅ ENVIRONMENT VALIDATION
+   ENVIRONMENT VALIDATION
 ================================ */
-if (!process.env.SESSION_SECRET) {
-  console.error("❌ SESSION_SECRET missing in .env file");
-  process.exit(1);
+const required = ["SESSION_SECRET", "DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME"];
+for (const key of required) {
+  if (!process.env[key]) {
+    console.error(`❌ Missing required env var: ${key}`);
+    process.exit(1);
+  }
 }
 
 /* ===============================
-   ✅ MIDDLEWARE SETUP
+   SECURITY HEADERS
 ================================ */
-
-// Security headers
-
 app.use(helmet());
 app.use(
   helmet.contentSecurityPolicy({
@@ -33,75 +34,90 @@ app.use(
   })
 );
 
+/* ===============================
+   RATE LIMITING
+   -- /login and /verify-otp are brute-force targets
+================================ */
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: { success: false, message: "Too many attempts. Try again in 15 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-// Logging requests
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+});
+
+app.use(globalLimiter);
+app.use("/login", authLimiter);
+app.use("/verify-otp", authLimiter);
+app.use("/forgot-password", authLimiter);
+
+/* ===============================
+   LOGGING
+================================ */
 app.use(morgan("dev"));
 
-// Body parsing
+/* ===============================
+   BODY PARSING
+================================ */
 app.use(express.urlencoded({ extended: true }));
-
-// Limit request body size (prevents abuse)
 app.use(express.json({ limit: "1mb" }));
 
 /* ===============================
-   ✅ SESSION CONFIGURATION
+   SESSION CONFIGURATION
 ================================ */
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-
     cookie: {
       httpOnly: true,
-      secure: false, // true only in HTTPS production
+      // FIX: was hardcoded false — now true in production (HTTPS)
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
   })
 );
 
 /* ===============================
-   ✅ STATIC FILES
+   STATIC FILES
 ================================ */
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ===============================
-   ✅ ROUTES IMPORT
+   ROUTES
 ================================ */
 const routes = require("./server/routes");
+const adminRoutes = require("./server/adminRoutes"); // FIX: was never mounted
+
 app.use("/", routes);
+app.use("/admin", adminRoutes); // FIX: admin panel now reachable
 
 /* ===============================
-   ✅ DEFAULT ROUTE
-================================ */
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "index.html"));
-});
-
-/* ===============================
-   ✅ 404 HANDLER
+   404 HANDLER
 ================================ */
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
 });
 
 /* ===============================
-   ✅ GLOBAL ERROR HANDLER
+   GLOBAL ERROR HANDLER
 ================================ */
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err);
-
-  res.status(500).json({
-    success: false,
-    message: "Internal Server Error",
-  });
+  res.status(500).json({ success: false, message: "Internal Server Error" });
 });
 
 /* ===============================
-   ✅ SERVER START
+   SERVER START
 ================================ */
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });

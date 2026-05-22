@@ -1,26 +1,28 @@
-// server/db.js (CommonJS)
+// server/db.js
+// FIX: switched from pg (PostgreSQL) to mysql2 to match the MySQL dump
 
-const { Pool } = require('pg');
-require('dotenv').config();
+const mysql = require("mysql2/promise");
+require("dotenv").config();
 
-// Create PostgreSQL pool
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
+const pool = mysql.createPool({
+  host:     process.env.DB_HOST,
+  port:     process.env.DB_PORT || 3306,
+  user:     process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-// Optional: test connection (NO top-level await)
-pool
-  .connect()
-  .then((client) => {
-    console.log('✅ Connected to PostgreSQL database');
-    client.release();
+// Test connection on startup
+pool.getConnection()
+  .then((conn) => {
+    console.log("✅ Connected to MySQL database");
+    conn.release();
   })
   .catch((err) => {
-    console.error('❌ Database connection error:', err);
+    console.error("❌ Database connection error:", err.message);
   });
 
 module.exports = pool;

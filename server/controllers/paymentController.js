@@ -1,15 +1,15 @@
 const db = require("../db");
-const emailService = require("../utils/emailService");
+const { sendEmail } = require("../utils/emailService");
 
 /* ===============================
-   ✅ MAKE PAYMENT + ADD TO GOAL
+   MAKE PAYMENT + ADD TO GOAL
 ================================ */
 exports.makePayment = async (req, res) => {
   const { goalId, amount, method } = req.body;
-  const userId = req.session.user.id;
+  const userId    = req.session.user.id;
   const userEmail = req.session.user.email;
 
-  if (!goalId || !amount || amount <= 0) {
+  if (!goalId || !amount || Number(amount) <= 0) {
     return res.status(400).send("Invalid payment details");
   }
 
@@ -17,54 +17,47 @@ exports.makePayment = async (req, res) => {
     return res.status(400).send("Payment method required");
   }
 
+  // FIX: mysql2 returns [rows] — destructure correctly
+  const conn = await db.getConnection();
+
   try {
-    /* ===============================
-       ✅ CHECK GOAL BELONGS TO USER
-    ================================ */
-    const goalResult = await db.query(
-      "SELECT * FROM savings_goals WHERE id = $1 AND user_id = $2",
+    /* Verify goal belongs to this user */
+    const [goalRows] = await conn.query(
+      "SELECT * FROM savings_goals WHERE id = ? AND user_id = ?",
       [goalId, userId]
     );
 
-    if (goalResult.rows.length === 0) {
+    if (goalRows.length === 0) {
+      conn.release();
       return res.status(404).send("Goal not found");
     }
 
-    const goal = goalResult.rows[0];
+    const goal = goalRows[0];
 
-    /* ===============================
-       ✅ BEGIN TRANSACTION
-    ================================ */
-    await db.query("BEGIN");
+    /* BEGIN TRANSACTION */
+    await conn.beginTransaction();
 
-    /* ===============================
-       ✅ INSERT PAYMENT RECORD
-    ================================ */
-    await db.query(
+    /* INSERT PAYMENT — FIX: `status` column now exists in DB dump */
+    await conn.query(
       `INSERT INTO payments (user_id, goal_id, amount, method, status)
-       VALUES ($1, $2, $3, $4, $5)`,
+       VALUES (?, ?, ?, ?, ?)`,
       [userId, goalId, amount, method, "SUCCESS"]
     );
 
-    /* ===============================
-       ✅ UPDATE GOAL CURRENT AMOUNT
-    ================================ */
-    await db.query(
+    /* UPDATE GOAL — FIX: column is current_amount */
+    await conn.query(
       `UPDATE savings_goals
-       SET current_amount = current_amount + $1
-       WHERE id = $2 AND user_id = $3`,
+       SET current_amount = current_amount + ?
+       WHERE id = ? AND user_id = ?`,
       [amount, goalId, userId]
     );
 
-    /* ===============================
-       ✅ COMMIT TRANSACTION
-    ================================ */
-    await db.query("COMMIT");
+    /* COMMIT */
+    await conn.commit();
+    conn.release();
 
-    /* ===============================
-       ✅ EMAIL NOTIFICATION
-    ================================ */
-    await emailService.sendEmail(
+    /* EMAIL NOTIFICATION */
+    await sendEmail(
       userEmail,
       "Payment Successful 💳",
       `You paid ₹${amount} using ${method} towards your savings goal.`,
@@ -78,13 +71,10 @@ exports.makePayment = async (req, res) => {
     );
 
     res.redirect("/dashboard");
-
   } catch (err) {
+    await conn.rollback();
+    conn.release();
     console.error("Payment Error:", err);
-
-    // Rollback
-    await db.query("ROLLBACK");
-
     res.status(500).send("Payment failed. Please try again.");
   }
 };

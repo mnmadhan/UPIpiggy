@@ -10,105 +10,150 @@
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      margin: 0;
-      padding: 0;
-    }
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  margin: 0;
+  padding: 0;
+  color: white;
+}
 
-    /* HEADER */
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 15px 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+/* ================= HEADER ================= */
+header {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
 
-    header h2 {
-      margin: 0;
-    }
+header h2 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
 
-    header a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      background: red;
-      padding: 8px 15px;
-      border-radius: 6px;
-    }
+header a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ff4e50, #f9d423);
+  padding: 8px 18px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
 
-    /* MAIN CONTAINER */
-    .container {
-      width: 90%;
-      max-width: 900px;
-      margin: 30px auto;
-    }
+header a:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
 
-    /* CARD DESIGN */
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    }
+/* ================= MAIN CONTAINER ================= */
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto;
+}
 
-    /* FORM INPUTS */
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-    }
+/* ================= CARD DESIGN ================= */
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  padding: 25px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+  transition: transform 0.4s ease;
+}
 
-    /* BUTTON */
-    button {
-      padding: 10px 15px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #3498db;
-      color: white;
-      font-weight: bold;
-      font-size: 15px;
-    }
+.card:hover {
+  transform: translateY(-8px);
+}
 
-    button:hover {
-      background: #217dbb;
-    }
+/* ================= INPUT ================= */
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 12px 0;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  outline: none;
+  transition: all 0.3s ease;
+}
 
-    /* GOAL BOX */
-    .goal {
-      border: 1px solid #ddd;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 15px;
-    }
+input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
 
-    /* PROGRESS BAR */
-    .progress-bar {
-      width: 100%;
-      background: #eee;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
+input:focus {
+  background: rgba(255,255,255,0.25);
+  box-shadow: 0 0 15px rgba(255,255,255,0.4);
+}
 
-    .progress-fill {
-      height: 12px;
-      background: green;
-      width: 0%;
-      transition: 0.4s;
-    }
+/* ================= BUTTON ================= */
+button {
+  padding: 12px 18px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #36d1dc, #5b86e5);
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
 
-    .goal p {
-      margin: 5px 0;
-    }
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* ================= GOAL BOX ================= */
+.goal {
+  background: rgba(255,255,255,0.1);
+  padding: 18px;
+  border-radius: 18px;
+  margin-top: 20px;
+  transition: transform 0.3s ease;
+}
+
+.goal:hover {
+  transform: translateX(6px);
+}
+
+/* ================= PROGRESS BAR ================= */
+.progress-bar {
+  width: 100%;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 12px;
+  height: 14px;
+}
+
+.progress-fill {
+  height: 14px;
+  background: linear-gradient(90deg, #00f260, #0575e6);
+  width: 0%;
+  border-radius: 20px;
+  transition: width 0.6s ease-in-out;
+}
+
+/* ================= GOAL TEXT ================= */
+.goal p {
+  margin: 6px 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
   </style>
 </head>
 

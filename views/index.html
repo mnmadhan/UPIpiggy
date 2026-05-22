@@ -6,232 +6,264 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary: #0066cc;
-      --secondary: #ff9900;
-      --accent: #6633cc;
-      --light: #f9f9f9;
-      --dark: #333;
-    }
-    
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f0f8ff;
-      color: #333;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%230066cc" opacity="0.1"/></svg>');
-      background-size: 200px;
-    }
-    
-    header {
-      background: var(--primary);
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    
-    .piggy-icon {
-      position: absolute;
-      left: 20px;
-      top: 15px;
-      font-size: 32px;
-      color: #ffd700;
-    }
-    
-    nav a {
-      color: #fff;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 8px 15px;
-      border-radius: 20px;
-      transition: all 0.3s;
-    }
-    
-    nav a:hover {
-      background: rgba(255,255,255,0.2);
-      text-decoration: none;
-    }
-    
-    .container {
-      width: 90%;
-      max-width: 1200px;
-      margin: 20px auto;
-    }
-    
-    .hero {
-      text-align: center;
-      padding: 40px 20px;
-      background: linear-gradient(135deg, #0066cc 0%, #6633cc 100%);
-      color: white;
-      border-radius: 16px;
-      margin-bottom: 40px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    
-    .hero h2 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
-    
-    .hero p {
-      font-size: 1.2rem;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    
-    h2 {
-      color: var(--primary);
-      position: relative;
-      display: inline-block;
-      margin-bottom: 30px;
-    }
-    
-    h2:after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      width: 50px;
-      height: 4px;
-      background: var(--secondary);
-      border-radius: 2px;
-    }
-    
-    /* Sponsor Cards */
-    .sponsor-highlight {
-      background: linear-gradient(135deg, #ff9900 0%, #ffcc00 100%);
-      padding: 25px;
-      border-radius: 16px;
-      margin: 40px 0;
-      text-align: center;
-      color: white;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .sponsor-highlight:before {
-      content: 'SPECIAL OFFER';
-      position: absolute;
-      top: -10px;
-      right: -35px;
-      background: #ff3366;
-      color: white;
-      padding: 20px 40px;
-      transform: rotate(45deg);
-      font-size: 12px;
-      font-weight: bold;
-      z-index: 1;
-    }
-    
-    .sponsor-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      margin-top: 30px;
-    }
-    
-    .sponsor-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-      transition: transform 0.3s, box-shadow 0.3s;
-      border-top: 5px solid var(--secondary);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .sponsor-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-    }
-    
-    .sponsor-card h3 {
-      margin: 0 0 15px;
-      color: var(--dark);
-      font-size: 1.4rem;
-    }
-    
-    .sponsor-card p {
-      margin: 8px 0;
-    }
-    
-    .sponsor-tag {
-      position: absolute;
-      top: 15px;
-      right: -30px;
-      background: var(--accent);
-      color: white;
-      padding: 5px 35px;
-      transform: rotate(45deg);
-      font-size: 12px;
-      font-weight: bold;
-    }
-    
-    .sponsor-benefits {
-      background: #f0f8ff;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 15px;
-      border-left: 3px solid var(--primary);
-    }
-    
-    footer {
-      margin-top: 60px;
-      background: var(--dark);
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-    }
-    
-    .floating-piggy {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 70px;
-      height: 70px;
-      background: var(--primary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 30px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      cursor: pointer;
-      z-index: 100;
-      animation: bounce 2s infinite;
-    }
-    
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-      40% {transform: translateY(-20px);}
-      60% {transform: translateY(-10px);}
-    }
-    
-    @media (max-width: 768px) {
-      nav a {
-        margin: 0 5px;
-        padding: 5px 10px;
-        font-size: 14px;
-      }
-      
-      .hero h2 {
-        font-size: 2rem;
-      }
-      
-      .sponsor-highlight:before {
-        right: -45px;
-        padding: 15px 35px;
-        font-size: 10px;
-      }
-    }
+  --bg: #e6edf5;
+  --primary: #3a86ff;
+  --accent: #ff006e;
+  --shadow-light: #ffffff;
+  --shadow-dark: #c8d0e7;
+  --text-dark: #2b2d42;
+}
+
+/* Global Reset Feel */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* Soft floating entrance */
+body {
+  animation: pageEnter 0.8s ease-out;
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= HEADER ================= */
+header {
+  padding: 20px;
+  text-align: center;
+  background: var(--bg);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light);
+  position: relative;
+  border-radius: 0 0 30px 30px;
+}
+
+.piggy-icon {
+  position: absolute;
+  left: 20px;
+  top: 18px;
+  font-size: 32px;
+  color: var(--primary);
+  transition: transform 0.4s ease;
+}
+
+.piggy-icon:hover {
+  transform: rotate(-15deg) scale(1.2);
+}
+
+/* ================= NAV ================= */
+nav a {
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 600;
+  margin: 0 10px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  background: var(--bg);
+  box-shadow:
+    5px 5px 10px var(--shadow-dark),
+    -5px -5px 10px var(--shadow-light);
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  box-shadow:
+    inset 5px 5px 10px var(--shadow-dark),
+    inset -5px -5px 10px var(--shadow-light);
+  color: var(--primary);
+}
+
+/* ================= CONTAINER ================= */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+/* ================= HERO ================= */
+.hero {
+  text-align: center;
+  padding: 70px 30px;
+  background: var(--bg);
+  border-radius: 30px;
+  box-shadow:
+    12px 12px 24px var(--shadow-dark),
+    -12px -12px 24px var(--shadow-light);
+  margin-bottom: 60px;
+  transition: transform 0.5s ease;
+}
+
+.hero:hover {
+  transform: scale(1.02);
+}
+
+.hero h2 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  color: var(--primary);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ================= SECTION TITLES ================= */
+h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+/* ================= SPONSOR HIGHLIGHT ================= */
+.sponsor-highlight {
+  padding: 40px;
+  border-radius: 30px;
+  background: linear-gradient(145deg, #f0f4fa, #dbe4f0);
+  box-shadow:
+    15px 15px 30px var(--shadow-dark),
+    -15px -15px 30px var(--shadow-light);
+  margin: 60px 0;
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.sponsor-highlight:hover {
+  transform: translateY(-10px);
+}
+
+.sponsor-highlight:before {
+  content: "LIMITED";
+  position: absolute;
+  top: -15px;
+  right: 30px;
+  background: var(--accent);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+/* ================= SPONSOR GRID ================= */
+.sponsor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  margin-top: 30px;
+}
+
+/* ================= SPONSOR CARD ================= */
+.sponsor-card {
+  padding: 30px;
+  border-radius: 25px;
+  background: var(--bg);
+  box-shadow:
+    10px 10px 20px var(--shadow-dark),
+    -10px -10px 20px var(--shadow-light);
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.sponsor-card:hover {
+  transform: translateY(-15px);
+  box-shadow:
+    20px 20px 40px var(--shadow-dark),
+    -20px -20px 40px var(--shadow-light);
+}
+
+.sponsor-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: var(--primary);
+}
+
+/* Tag badge floating pill */
+.sponsor-tag {
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  background: var(--primary);
+  color: white;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* Benefits pill style */
+.sponsor-benefits {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 20px;
+  background: var(--bg);
+  box-shadow:
+    inset 5px 5px 10px var(--shadow-dark),
+    inset -5px -5px 10px var(--shadow-light);
+}
+
+/* ================= FOOTER ================= */
+footer {
+  margin-top: 80px;
+  padding: 30px;
+  text-align: center;
+  background: var(--bg);
+  border-radius: 40px 40px 0 0;
+  box-shadow:
+    -10px -10px 20px var(--shadow-light),
+    10px 10px 20px var(--shadow-dark);
+}
+
+/* ================= FLOATING PIGGY ================= */
+.floating-piggy {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow:
+    10px 10px 20px var(--shadow-dark),
+    -10px -10px 20px var(--shadow-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.floating-piggy:hover {
+  box-shadow:
+    inset 8px 8px 15px var(--shadow-dark),
+    inset -8px -8px 15px var(--shadow-light);
+  transform: scale(1.1);
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  nav a {
+    display: inline-block;
+    margin: 5px;
+    padding: 8px 15px;
+  }
+
+  .hero h2 {
+    font-size: 2rem;
+  }
+}
   </style>
 </head>
 <body>
