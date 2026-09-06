@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Money Requests — UPI Savings Bank</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{--ink:#0a0a0f;--gold:#c9a84c;--teal:#1a7c6e;--teal-light:#2db89f;--paper:#f5f3ee;--warm:#f0ebe0;--muted:#7a7570;--border:rgba(10,10,15,.1)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+    header{background:var(--ink);padding:18px 36px;display:flex;justify-content:space-between;align-items:center}
+    header h2{font-family:'Syne',sans-serif;font-weight:800;color:var(--gold);font-size:1.1rem}
+    .btn-back{color:rgba(255,255,255,.7);text-decoration:none;font-size:.85rem;display:flex;align-items:center;gap:8px;transition:color .2s}
+    .btn-back:hover{color:white}
+    .container{max-width:860px;margin:36px auto;padding:0 20px}
+    .card{background:white;border-radius:20px;padding:28px;border:1px solid var(--border);margin-bottom:24px}
+    .card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:20px}
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:.75rem;font-weight:600;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
+    .field input,.field select,.field textarea{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:.9rem;font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--ink);outline:none;transition:border-color .2s}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);background:white}
+    .submit-btn{width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--gold),#e8a020);color:var(--ink);font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s}
+    .submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(201,168,76,.4)}
+    .form-msg{margin-top:12px;font-size:.83rem;font-weight:600;min-height:20px}
+    .msg-ok{color:var(--teal)} .msg-err{color:#dc2626}
+    /* TABS */
+    .tabs{display:flex;gap:8px;margin-bottom:20px}
+    .tab{padding:8px 18px;border-radius:100px;font-size:.83rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--warm);color:var(--muted);transition:all .2s}
+    .tab.active{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+    /* REQUEST ROW */
+    .req-list{display:flex;flex-direction:column;gap:14px}
+    .req-row{background:var(--warm);border-radius:16px;padding:20px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .req-left .req-goal{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem}
+    .req-left .req-meta{font-size:.78rem;color:var(--muted);margin-top:4px}
+    .req-left .req-reason{font-size:.82rem;color:var(--ink);margin-top:6px;font-style:italic}
+    .req-left .req-note{font-size:.8rem;color:var(--teal);margin-top:6px}
+    .req-right{text-align:right;flex-shrink:0}
+    .req-amount{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem}
+    .badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;margin-top:6px}
+    .badge.PENDING{background:rgba(234,179,8,.15);color:#ca8a04}
+    .badge.APPROVED{background:rgba(26,124,110,.15);color:var(--teal)}
+    .badge.REJECTED{background:rgba(220,38,38,.12);color:#dc2626}
+    .empty{text-align:center;padding:40px;color:var(--muted);font-size:.9rem}
+  </style>
+</head>
+<body>
+<header>
+  <h2><i class="fas fa-hand-holding-usd"></i> Money Requests</h2>
+  <a href="/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+</header>
+
+<div class="container">
+
+  <!-- NEW REQUEST FORM -->
+  <div class="card">
+    <div class="card-title">📤 New Money Request</div>
+    <div class="field">
+      <label>Goal</label>
+      <select id="reqGoal"><option value="">Select a goal...</option></select>
+    </div>
+    <div class="field"><label>Amount (₹)</label><input type="number" id="reqAmount" placeholder="How much do you need?" min="1"></div>
+    <div class="field"><label>Reason</label><input type="text" id="reqReason" placeholder="Why do you need this? (shown to admin)"></div>
+    <button class="submit-btn" onclick="submitRequest()">📤 Submit Request to Admin</button>
+    <div class="form-msg" id="formMsg"></div>
+  </div>
+
+  <!-- MY REQUESTS -->
+  <div class="card">
+    <div class="card-title">📋 My Requests</div>
+    <div class="tabs">
+      <button class="tab active" data-f="all">All</button>
+      <button class="tab" data-f="PENDING">⏳ Pending</button>
+      <button class="tab" data-f="APPROVED">✅ Approved</button>
+      <button class="tab" data-f="REJECTED">❌ Rejected</button>
+    </div>
+    <div class="req-list" id="reqList"><p class="empty">Loading...</p></div>
+  </div>
+
+</div>
+
+<script>
+  let allRequests = [];
+  let activeFilter = 'all';
+
+  async function loadGoals() {
+    try {
+      const goals = await fetch('/api/goals').then(r => r.json());
+      const sel = document.getElementById('reqGoal');
+      goals.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g.id; opt.textContent = `${g.goal_name} (₹${Number(g.current_amount).toLocaleString('en-IN')} saved)`;
+        sel.appendChild(opt);
+      });
+    } catch(e) {}
+  }
+
+  async function submitRequest() {
+    const goalId = document.getElementById('reqGoal').value;
+    const amount = document.getElementById('reqAmount').value;
+    const reason = document.getElementById('reqReason').value;
+    const msg    = document.getElementById('formMsg');
+
+    if (!goalId) { msg.innerHTML = '<span class="msg-err">Please select a goal</span>'; return; }
+    if (!amount || Number(amount) <= 0) { msg.innerHTML = '<span class="msg-err">Enter a valid amount</span>'; return; }
+
+    msg.innerHTML = '⏳ Submitting...';
+    try {
+      const data = await fetch('/api/money-requests', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ goalId, amount, reason })
+      }).then(r => r.json());
+
+      if (data.success) {
+        msg.innerHTML = '<span class="msg-ok">✅ Request submitted! Admin will review it.</span>';
+        document.getElementById('reqGoal').value   = '';
+        document.getElementById('reqAmount').value = '';
+        document.getElementById('reqReason').value = '';
+        loadRequests();
+      } else { msg.innerHTML = `<span class="msg-err">❌ ${data.message}</span>`; }
+    } catch(e) { msg.innerHTML = '<span class="msg-err">Something went wrong</span>'; }
+  }
+
+  async function loadRequests() {
+    try {
+      const data = await fetch('/api/money-requests').then(r => r.json());
+      allRequests = data.requests || [];
+      renderRequests();
+    } catch(e) { document.getElementById('reqList').innerHTML = '<p class="empty">Failed to load requests.</p>'; }
+  }
+
+  function renderRequests() {
+    const list = document.getElementById('reqList');
+    const filtered = activeFilter === 'all' ? allRequests : allRequests.filter(r => r.status === activeFilter);
+    if (!filtered.length) { list.innerHTML = '<p class="empty">No requests found.</p>'; return; }
+
+    list.innerHTML = filtered.map(r => {
+      const date = new Date(r.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+      return `
+        <div class="req-row">
+          <div class="req-left">
+            <div class="req-goal">🎯 ${r.goal_name}</div>
+            <div class="req-meta">Submitted: ${date}</div>
+            ${r.reason ? `<div class="req-reason">"${r.reason}"</div>` : ''}
+            ${r.admin_note ? `<div class="req-note"><i class="fas fa-comment"></i> Admin: ${r.admin_note}</div>` : ''}
+          </div>
+          <div class="req-right">
+            <div class="req-amount">₹${Number(r.amount).toLocaleString('en-IN')}</div>
+            <div><span class="badge ${r.status}">${r.status}</span></div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  document.querySelectorAll('.tab').forEach(tab =>
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      activeFilter = this.dataset.f;
+      renderRequests();
+    })
+  );
+
+  loadGoals();
+  loadRequests();
+</script>
+</body>
+</html>

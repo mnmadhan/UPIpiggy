@@ -1,29 +1,26 @@
 const express = require("express");
-const path = require("node:path");
-const router = express.Router();
+const path    = require("node:path");
+const router  = express.Router();
 const adminController = require("./controllers/adminController");
 
-/* ================= ADMIN LOGIN API ================= */
-router.post("/login", adminController.adminLogin);
+// ── PUBLIC ROUTES (no auth needed) ──
+// localhost:3000/admin  → serves the admin page (login overlay inside handles auth)
+router.get("/",       (req, res) => res.sendFile(path.join(__dirname, "../views/admin.html")));
+router.post("/login",  adminController.adminLogin);
+router.get("/logout",  adminController.adminLogout);
 
-/* ================= ADMIN LOGOUT ================= */
-// FIX: admin.html calls /admin/logout — route was missing
-router.get("/logout", adminController.adminLogout);
-
-/* ================= ADMIN UI PAGE ================= */
-router.get("/panel", adminController.ensureAdmin, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/admin.html"));
-});
-
-/* ================= ADMIN APIs (protected) ================= */
+// ── PROTECTED ROUTES (must be logged in as admin) ──
 router.use(adminController.ensureAdmin);
 
-// Users & Payments (for admin.html data tables)
+router.get("/stats",    adminController.getStats);
 router.get("/users",    adminController.getAllUsers);
 router.get("/payments", adminController.getAllPayments);
 
-// Sponsored goals
 router.post("/sponsored-goals", adminController.addSponsoredGoal);
 router.get("/sponsored-goals",  adminController.getSponsoredGoalsAdmin);
+
+router.get("/money-requests",               adminController.getMoneyRequests);
+router.post("/money-requests/:id/approve",  adminController.approveRequest);
+router.post("/money-requests/:id/reject",   adminController.rejectRequest);
 
 module.exports = router;

@@ -1,124 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up - UPI Money Bank</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — UPI Savings Bank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(120deg, #1e3c72, #2a5298);
-      overflow: hidden;
-      position: relative;
-    }
-    body::before, body::after {
-      content: "";
-      position: absolute;
-      width: 400px;
-      height: 400px;
-      border-radius: 50%;
-      opacity: 0.2;
-      filter: blur(80px);
-    }
-    body::before { background: #ff6a00; top: -100px; left: -100px; }
-    body::after  { background: #00f5a0; bottom: -100px; right: -100px; }
-    .signup-container {
-      background: #ffffff;
-      padding: 40px 35px;
-      border-radius: 30px;
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.35);
-      position: relative;
-      z-index: 2;
-    }
-    .signup-container h2 { margin-bottom: 20px; font-size: 26px; font-weight: 700; color: #1e3c72; }
-    .signup-container input {
-      width: 100%;
-      padding: 13px;
-      margin: 9px 0;
-      border: none;
-      border-radius: 14px;
-      font-size: 14px;
-      background: #f1f5f9;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-    }
-    .signup-container input:focus {
-      outline: none;
-      background: #e0f2fe;
-      box-shadow: 0 0 12px rgba(30,60,114,0.4);
-    }
-    /* label for date-of-birth */
-    .field-label {
-      display: block;
-      text-align: left;
-      font-size: 12px;
-      color: #555;
-      margin: 6px 0 2px 4px;
-    }
-    .signup-container button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 16px;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .signup-container button:hover  { transform: scale(1.05); box-shadow: 0 12px 25px rgba(0,0,0,0.3); }
-    .signup-container button:active { transform: scale(0.96); }
-    .signup-container p  { margin-top: 16px; font-size: 14px; color: #555; }
-    .signup-container a  { color: #0072ff; font-weight: 600; text-decoration: none; }
-    .signup-container a:hover { color: #00c6ff; }
-    #msg { margin-top: 12px; font-weight: bold; color: #ff3b3b; font-size: 13px; }
+    :root { --ink:#0a0a0f; --gold:#c9a84c; --teal:#1a7c6e; --teal-light:#2db89f; --paper:#f5f3ee; --muted:#7a7570; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:var(--ink);color:white;overflow-x:hidden}
+    .left{display:flex;flex-direction:column;justify-content:space-between;padding:48px;background:linear-gradient(160deg,#0a1015,#091410);position:relative;overflow:hidden}
+    .left::before{content:'';position:absolute;top:-100px;right:-100px;width:450px;height:450px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.2) 0%,transparent 70%);pointer-events:none}
+    .left::after{content:'';position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(26,124,110,.3) 0%,transparent 70%);pointer-events:none}
+    .logo{display:flex;align-items:center;gap:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:white;text-decoration:none;position:relative;z-index:1}
+    .logo-icon{width:38px;height:38px;border-radius:12px;background:var(--gold);display:grid;place-items:center;font-size:18px;color:var(--ink)}
+    .left-middle{position:relative;z-index:1}
+    .left-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.2rem,3vw,3rem);line-height:1.05;letter-spacing:-.03em}
+    .left-title span{color:var(--teal-light)}
+    .left-sub{margin-top:16px;color:rgba(255,255,255,.45);line-height:1.7;font-size:.9rem}
+    .perks{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px}
+    .perk{display:flex;align-items:center;gap:14px;font-size:.88rem;color:rgba(255,255,255,.6)}
+    .perk-icon{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.06);display:grid;place-items:center;font-size:16px;flex-shrink:0}
+
+    .right{background:var(--paper);display:flex;align-items:center;justify-content:center;padding:48px;overflow-y:auto}
+    .form-box{width:100%;max-width:400px}
+    .form-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.9rem;color:var(--ink);margin-bottom:6px}
+    .form-subtitle{font-size:.88rem;color:var(--muted);margin-bottom:32px}
+    .form-subtitle a{color:var(--teal);font-weight:600;text-decoration:none}
+
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:.78rem;font-weight:600;letter-spacing:.06em;color:var(--ink);margin-bottom:7px;text-transform:uppercase}
+    .field input{width:100%;padding:13px 16px;border:1.5px solid rgba(10,10,15,.12);border-radius:12px;font-size:.93rem;font-family:'DM Sans',sans-serif;background:white;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s}
+    .field input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(26,124,110,.12)}
+    .field input.invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+    .field input::placeholder{color:#bbb}
+    .field-hint{font-size:.74rem;color:var(--muted);margin-top:5px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+    .password-strength{height:4px;background:#eee;border-radius:2px;margin-top:8px;overflow:hidden}
+    .strength-fill{height:100%;width:0;border-radius:2px;transition:width .3s,background .3s}
+    .strength-label{font-size:.72rem;margin-top:4px;font-weight:600}
+
+    .submit-btn{width:100%;padding:15px;border:none;border-radius:12px;background:var(--ink);color:var(--gold);font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .25s;margin-top:4px}
+    .submit-btn:hover{background:#1a1a2e;transform:translateY(-1px);box-shadow:0 8px 20px rgba(10,10,15,.2)}
+    .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    .msg{padding:12px 16px;border-radius:10px;font-size:.85rem;margin-top:14px;display:none}
+    .msg.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;display:block}
+    .msg.success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;display:block}
+
+    .terms{font-size:.8rem;color:var(--muted);text-align:center;margin-top:16px}
+    .terms a{color:var(--teal);text-decoration:none}
+
+    @media(max-width:768px){body{grid-template-columns:1fr}.left{display:none}.right{padding:32px 20px}}
   </style>
 </head>
 <body>
-  <div class="signup-container">
-    <h2>📝 Create Account</h2>
+  <div class="left">
+    <a href="/" class="logo"><span class="logo-icon">🏦</span>UPI Savings Bank</a>
+    <div class="left-middle">
+      <h1 class="left-title">Start your<br><span>savings</span><br>journey today</h1>
+      <p class="left-sub">Join thousands of smart savers achieving their financial goals with UPI-powered deposits and real sponsor rewards.</p>
+    </div>
+    <div class="perks">
+      <div class="perk"><span class="perk-icon">🎯</span>Set unlimited savings goals</div>
+      <div class="perk"><span class="perk-icon">⚡</span>Instant UPI deposits, anytime</div>
+      <div class="perk"><span class="perk-icon">🎁</span>Unlock exclusive sponsor offers</div>
+      <div class="perk"><span class="perk-icon">🔒</span>Bank-grade security with OTP</div>
+    </div>
+  </div>
 
-    <form id="signupForm" method="POST" action="/signup">
+  <div class="right">
+    <div class="form-box">
+      <h2 class="form-title">Create account</h2>
+      <p class="form-subtitle">Already have one? <a href="/login">Sign in →</a></p>
 
-      <input type="text"  name="username" placeholder="Username" required />
-      <input type="email" name="email"    placeholder="Email"    required />
-
-      <!-- FIX: phone and dob were in the form before but missing here -->
-      <input type="tel"  name="phone" placeholder="Phone number (optional)" />
-
-      <label class="field-label">Date of Birth</label>
-      <input type="date" name="dob" />
-
-      <input type="password" name="password"        id="password"        placeholder="Password"         required />
-      <input type="password" id="confirmPassword"                         placeholder="Confirm Password" required />
-
-      <button type="submit">Sign Up</button>
-      <div id="msg"></div>
-    </form>
-
-    <p>Already have an account? <a href="/login">Login</a></p>
+      <!-- No native form POST — handled via fetch for proper JSON validation -->
+      <div id="signupForm">
+        <div class="row2">
+          <div class="field">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="coolsaver" maxlength="30" autocomplete="username">
+            <div class="field-hint">3–30 chars, letters, numbers, _</div>
+          </div>
+          <div class="field">
+            <label>Phone <span style="font-weight:400;text-transform:none">(optional)</span></label>
+            <input type="tel" id="phone" placeholder="+91 9876543210">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Date of Birth <span style="font-weight:400;text-transform:none">(optional)</span></label>
+          <input type="date" id="dob">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Min. 8 chars" autocomplete="new-password">
+          <div class="password-strength"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="strength-label" id="strengthLabel" style="color:#bbb"></div>
+          <div class="field-hint">At least 8 chars, one uppercase, one number, one special character</div>
+        </div>
+        <div class="field">
+          <label>Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Repeat password" autocomplete="new-password">
+        </div>
+        <button class="submit-btn" id="signupBtn" onclick="submitSignup()">Create Free Account →</button>
+        <div class="msg" id="msg"></div>
+      </div>
+      <p class="terms">By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a></p>
+    </div>
   </div>
 
   <script>
-    document.getElementById("signupForm").addEventListener("submit", function (e) {
-      const pass    = document.getElementById("password").value;
-      const confirm = document.getElementById("confirmPassword").value;
-      const msg     = document.getElementById("msg");
+    /* ── Password strength meter ── */
+    const pwdInput = document.getElementById('password');
+    const fill     = document.getElementById('strengthFill');
+    const label    = document.getElementById('strengthLabel');
+    const colors   = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+    const labels   = ['Weak', 'Fair', 'Good', 'Strong'];
 
-      if (pass !== confirm) {
-        e.preventDefault();
-        msg.innerHTML = "❌ Passwords do not match!";
+    pwdInput.addEventListener('input', () => {
+      const v = pwdInput.value;
+      let score = 0;
+      if (v.length >= 8)             score++;
+      if (/[A-Z]/.test(v))           score++;
+      if (/[0-9]/.test(v))           score++;
+      if (/[^A-Za-z0-9]/.test(v))    score++;
+      fill.style.width      = (score * 25) + '%';
+      fill.style.background = colors[score - 1] || '#eee';
+      label.textContent     = score > 0 ? labels[score - 1] : '';
+      label.style.color     = colors[score - 1] || '#bbb';
+    });
+
+    /* ── Client-side validation (mirrors server rules exactly) ── */
+    function validateForm() {
+      const username  = document.getElementById('username').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+      const password  = document.getElementById('password').value;
+      const confirm   = document.getElementById('confirmPassword').value;
+
+      if (!username) return 'Username is required.';
+      if (!/^[a-zA-Z0-9_]{3,30}$/.test(username))
+        return 'Username must be 3–30 characters and contain only letters, numbers, or underscores.';
+
+      if (!email) return 'Email address is required.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return 'Please enter a valid email address.';
+
+      if (phone && !/^\+?[0-9]{7,15}$/.test(phone))
+        return 'Please enter a valid phone number (digits only, 7–15 chars).';
+
+      if (!password) return 'Password is required.';
+      if (password.length < 8)               return 'Password must be at least 8 characters.';
+      if (!/[A-Z]/.test(password))           return 'Password must include at least one uppercase letter.';
+      if (!/[0-9]/.test(password))           return 'Password must include at least one number.';
+      if (!/[^A-Za-z0-9]/.test(password))   return 'Password must include at least one special character (e.g. @, #, !).';
+
+      if (!confirm) return 'Please confirm your password.';
+      if (password !== confirm)             return 'Passwords do not match.';
+
+      return null; // all good
+    }
+
+    async function submitSignup() {
+      const msg = document.getElementById('msg');
+      const btn = document.getElementById('signupBtn');
+      msg.className = 'msg';
+
+      // Client-side check first
+      const error = validateForm();
+      if (error) {
+        msg.textContent = '❌ ' + error;
+        msg.classList.add('error');
+        return;
       }
+
+      btn.disabled    = true;
+      btn.textContent = 'Creating account…';
+
+      try {
+        const res = await fetch('/signup', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value.trim(),
+            email:    document.getElementById('email').value.trim(),
+            phone:    document.getElementById('phone').value.trim(),
+            dob:      document.getElementById('dob').value,
+            password: document.getElementById('password').value,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          msg.textContent = '✅ OTP sent to your email! Redirecting…';
+          msg.classList.add('success');
+          setTimeout(() => window.location.href = data.redirect || '/otp', 1000);
+        } else {
+          msg.textContent = '❌ ' + data.message;
+          msg.classList.add('error');
+          btn.disabled    = false;
+          btn.textContent = 'Create Free Account →';
+        }
+      } catch (e) {
+        msg.textContent = '❌ Something went wrong. Please try again.';
+        msg.classList.add('error');
+        btn.disabled    = false;
+        btn.textContent = 'Create Free Account →';
+      }
+    }
+
+    /* Allow Enter key to submit */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitSignup();
     });
   </script>
 </body>

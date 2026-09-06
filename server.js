@@ -1,10 +1,10 @@
-const express = require("express");
-const session = require("express-session");
-const path = require("path");
-const dotenv = require("dotenv");
-const morgan = require("morgan");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+const express    = require("express");
+const session    = require("express-session");
+const path       = require("path");
+const dotenv     = require("dotenv");
+const morgan     = require("morgan");
+const helmet     = require("helmet");
+const rateLimit  = require("express-rate-limit");
 
 dotenv.config();
 
@@ -23,27 +23,36 @@ for (const key of required) {
 
 /* ===============================
    SECURITY HEADERS
+   FIX: Added font/icon CDN sources to CSP so Google Fonts
+        and Font Awesome load correctly in the browser.
 ================================ */
-app.use(helmet());
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc:  ["'self'"],
+        scriptSrc:   ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+        styleSrc:    ["'self'", "'unsafe-inline'",
+                      "https://fonts.googleapis.com",
+                      "https://cdnjs.cloudflare.com"],
+        fontSrc:     ["'self'", "https://fonts.gstatic.com",
+                      "https://cdnjs.cloudflare.com"],
+        imgSrc:      ["'self'", "data:", "https:"],
+        connectSrc:  ["'self'"],
+      },
     },
   })
 );
 
 /* ===============================
    RATE LIMITING
-   -- /login and /verify-otp are brute-force targets
 ================================ */
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 20,
   message: { success: false, message: "Too many attempts. Try again in 15 minutes." },
   standardHeaders: true,
-  legacyHeaders: false,
+  legacyHeaders:   false,
 });
 
 const globalLimiter = rateLimit({
@@ -52,8 +61,8 @@ const globalLimiter = rateLimit({
 });
 
 app.use(globalLimiter);
-app.use("/login", authLimiter);
-app.use("/verify-otp", authLimiter);
+app.use("/login",           authLimiter);
+app.use("/verify-otp",      authLimiter);
 app.use("/forgot-password", authLimiter);
 
 /* ===============================
@@ -72,15 +81,14 @@ app.use(express.json({ limit: "1mb" }));
 ================================ */
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
+    secret:            process.env.SESSION_SECRET,
+    resave:            false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      // FIX: was hardcoded false — now true in production (HTTPS)
-      secure: process.env.NODE_ENV === "production",
+      secure:   process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 1000 * 60 * 60 * 2, // 2 hours
+      maxAge:   1000 * 60 * 60 * 2, // 2 hours
     },
   })
 );
@@ -93,11 +101,11 @@ app.use(express.static(path.join(__dirname, "public")));
 /* ===============================
    ROUTES
 ================================ */
-const routes = require("./server/routes");
-const adminRoutes = require("./server/adminRoutes"); // FIX: was never mounted
+const routes      = require("./server/routes");
+const adminRoutes = require("./server/adminRoutes");
 
-app.use("/", routes);
-app.use("/admin", adminRoutes); // FIX: admin panel now reachable
+app.use("/",      routes);
+app.use("/admin", adminRoutes);
 
 /* ===============================
    404 HANDLER
@@ -117,7 +125,7 @@ app.use((err, req, res, next) => {
 /* ===============================
    SERVER START
 ================================ */
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });

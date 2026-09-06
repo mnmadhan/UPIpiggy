@@ -1,196 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payment - UPI Savings Bank</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment — UPI Savings Bank</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+    :root{--ink:#0a0a0f;--gold:#c9a84c;--gold-light:#e8d5a3;--teal:#1a7c6e;--teal-light:#2db89f;--paper:#f5f3ee;--warm:#f0ebe0;--muted:#7a7570;--border:rgba(10,10,15,.1)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;background:var(--paper);color:var(--ink)}
+    
+    header{background:var(--ink);padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
+    .header-logo{display:flex;align-items:center;gap:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:white;text-decoration:none}
+    .header-logo-icon{width:34px;height:34px;border-radius:10px;background:var(--gold);display:grid;place-items:center;font-size:15px;color:var(--ink)}
+    .header-back{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.5);text-decoration:none;font-size:.88rem;transition:color .2s}
+    .header-back:hover{color:white}
 
-/* ================= HEADER ================= */
-header {
-  background: transparent;
-  color: white;
-  padding: 25px;
-  text-align: center;
-  font-size: 22px;
-  letter-spacing: 1px;
-  font-weight: 600;
-}
+    .page{max-width:1000px;margin:0 auto;padding:40px 24px;display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start}
 
-/* ================= CONTAINER ================= */
-.container {
-  width: 90%;
-  max-width: 500px;
-  margin: 40px auto;
-  padding: 35px;
-  border-radius: 25px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-  color: white;
-  transition: transform 0.4s ease;
-}
+    /* ── LEFT ── */
+    .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:4px}
+    .page-sub{font-size:.88rem;color:var(--muted);margin-bottom:28px}
 
-.container:hover {
-  transform: translateY(-8px);
-}
+    /* GOAL INFO BOX */
+    .goal-info{background:white;border-radius:18px;padding:24px;border:1px solid var(--border);margin-bottom:24px}
+    .goal-info-header{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+    .goal-name-big{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:4px}
+    .goal-amounts-row{display:flex;gap:24px;font-size:.85rem;color:var(--muted);margin:12px 0 16px}
+    .goal-amounts-row strong{color:var(--ink)}
+    .progress-track{height:10px;background:rgba(10,10,15,.08);border-radius:100px;overflow:hidden}
+    .progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--teal),var(--teal-light));transition:width .8s ease}
 
-/* ================= LABEL ================= */
-label {
-  font-weight: 600;
-  display: block;
-  margin-top: 20px;
-  font-size: 14px;
-  letter-spacing: 0.5px;
-}
+    /* QUICK AMOUNTS */
+    .quick-amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+    .quick-chip{padding:11px;border-radius:12px;background:white;border:1.5px solid var(--border);text-align:center;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .2s}
+    .quick-chip:hover,.quick-chip.selected{border-color:var(--teal);background:rgba(26,124,110,.06);color:var(--teal)}
 
-/* ================= INPUTS ================= */
-input,
-select {
-  width: 100%;
-  padding: 14px;
-  margin-top: 8px;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.25);
-  color: white;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
+    /* PAYMENT FORM */
+    .pay-form-card{background:white;border-radius:18px;padding:28px;border:1px solid var(--border)}
+    .field{margin-bottom:18px}
+    .field label{display:block;font-size:.78rem;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
+    .field input,.field select{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:.95rem;font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s}
+    .field input:focus,.field select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(26,124,110,.1);background:white}
+    .field input::placeholder{color:#bbb}
+    .amount-prefix{position:relative}
+    .amount-prefix::before{content:'₹';position:absolute;left:16px;top:50%;transform:translateY(-50%);font-weight:600;color:var(--muted);font-size:1rem;z-index:1}
+    .amount-prefix input{padding-left:32px}
 
-input::placeholder {
-  color: rgba(255,255,255,0.8);
-}
+    /* PAYMENT METHODS */
+    .methods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+    .method-btn{display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--warm);cursor:pointer;transition:all .2s;font-size:.88rem;font-weight:500;font-family:'DM Sans',sans-serif;color:var(--ink)}
+    .method-btn:hover,.method-btn.selected{border-color:var(--teal);background:rgba(26,124,110,.06)}
+    .method-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:15px}
+    .method-input{display:none}
 
-input:focus,
-select:focus {
-  background: rgba(255,255,255,0.4);
-  box-shadow: 0 0 15px rgba(255,255,255,0.6);
-}
+    .pay-btn{width:100%;padding:16px;border:none;border-radius:14px;background:var(--ink);color:var(--gold);font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;cursor:pointer;transition:all .25s;margin-top:6px}
+    .pay-btn:hover{background:#1a1a2e;transform:translateY(-1px);box-shadow:0 10px 24px rgba(10,10,15,.2)}
+    .pay-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
-/* ================= BUTTON ================= */
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 25px;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-  border: none;
-  border-radius: 14px;
-  color: #333;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+    /* ── RIGHT: SUMMARY ── */
+    .summary-card{background:var(--ink);border-radius:20px;padding:32px;color:white;position:sticky;top:24px}
+    .summary-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:24px}
+    .summary-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+    .summary-row:last-of-type{border:none}
+    .summary-row-label{font-size:.85rem;color:rgba(255,255,255,.45)}
+    .summary-row-val{font-weight:600;font-size:.92rem}
+    .summary-total-row{display:flex;justify-content:space-between;align-items:center;padding:18px 0 0;margin-top:8px;border-top:1px solid rgba(255,255,255,.1)}
+    .summary-total-label{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:white}
+    .summary-total-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--gold)}
 
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
+    .secure-badge{display:flex;align-items:center;gap:8px;margin-top:20px;font-size:.78rem;color:rgba(255,255,255,.3)}
+    .secure-badge i{color:var(--teal-light)}
 
-button:active {
-  transform: scale(0.97);
-}
+    /* SUCCESS OVERLAY */
+    .success-overlay{position:fixed;inset:0;background:rgba(10,10,15,.7);display:none;place-items:center;z-index:999;backdrop-filter:blur(8px)}
+    .success-overlay.show{display:grid}
+    .success-box{background:white;border-radius:28px;padding:52px 40px;text-align:center;max-width:380px;animation:popIn .4s ease}
+    @keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+    .success-icon{font-size:3rem;margin-bottom:20px}
+    .success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:8px;color:var(--ink)}
+    .success-sub{font-size:.9rem;color:var(--muted);line-height:1.6;margin-bottom:28px}
+    .success-btns{display:flex;gap:12px}
+    .success-btn{flex:1;padding:13px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s;border:none}
+    .success-btn.primary{background:var(--ink);color:var(--gold)}
+    .success-btn.secondary{background:var(--warm);color:var(--ink)}
 
-/* ================= BACK LINK ================= */
-.back {
-  display: block;
-  text-align: center;
-  margin-top: 20px;
-  text-decoration: none;
-  font-weight: bold;
-  color: white;
-  transition: 0.3s;
-}
-
-.back:hover {
-  letter-spacing: 1px;
-}
-
-/* ================= GOAL BOX ================= */
-.goal-box {
-  background: rgba(255,255,255,0.25);
-  padding: 15px;
-  border-radius: 15px;
-  margin-top: 20px;
-  font-size: 14px;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-
-.goal-box:hover {
-  background: rgba(255,255,255,0.4);
-}
+    @media(max-width:768px){.page{grid-template-columns:1fr}.summary-card{position:static}}
   </style>
 </head>
-
 <body>
 
   <header>
-    <h1>💳 UPI Payment Page</h1>
+    <a href="/" class="header-logo"><span class="header-logo-icon">🏦</span>UPI Savings</a>
+    <a href="/dashboard" class="header-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
   </header>
 
-  <div class="container">
-    <h2>Make a Payment</h2>
+  <div class="page">
+    <div>
+      <h1 class="page-title">💳 Add Money</h1>
+      <p class="page-sub">Deposit funds into your savings goal</p>
 
-    <!-- Goal Info -->
-    <div class="goal-box">
-      <p><b>Selected Goal ID:</b> <span id="goalIdText"></span></p>
+      <!-- GOAL INFO -->
+      <div class="goal-info" id="goalInfo">
+        <div class="goal-info-header">Saving For</div>
+        <div class="goal-name-big" id="goalNameDisplay">Loading goal...</div>
+        <div class="goal-amounts-row">
+          <span>Saved: <strong id="goalSaved">₹—</strong></span>
+          <span>Target: <strong id="goalTarget">₹—</strong></span>
+          <span>Remaining: <strong id="goalRemaining">₹—</strong></span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="goalProgress" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- QUICK AMOUNTS -->
+      <div class="quick-amounts">
+        <div class="quick-chip" onclick="setAmount(500)">₹500</div>
+        <div class="quick-chip" onclick="setAmount(1000)">₹1,000</div>
+        <div class="quick-chip" onclick="setAmount(2000)">₹2,000</div>
+        <div class="quick-chip" onclick="setAmount(5000)">₹5,000</div>
+      </div>
+
+      <!-- PAYMENT FORM -->
+      <div class="pay-form-card">
+        <form id="payForm" action="/payment" method="POST">
+          <input type="hidden" name="goalId" id="goalIdInput">
+
+          <div class="field">
+            <label>Amount to Deposit</label>
+            <div class="amount-prefix">
+              <input type="number" name="amount" id="amountInput" placeholder="Enter amount" min="1" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Payment Method</label>
+            <div class="methods-grid">
+              <label class="method-btn" id="method-upi">
+                <input class="method-input" type="radio" name="method" value="UPI" required>
+                <span class="method-icon">⚡</span> UPI
+              </label>
+              <label class="method-btn" id="method-debit">
+                <input class="method-input" type="radio" name="method" value="Debit Card">
+                <span class="method-icon">💳</span> Debit Card
+              </label>
+              <label class="method-btn" id="method-credit">
+                <input class="method-input" type="radio" name="method" value="Credit Card">
+                <span class="method-icon">🏦</span> Credit Card
+              </label>
+              <label class="method-btn" id="method-netbanking">
+                <input class="method-input" type="radio" name="method" value="Net Banking">
+                <span class="method-icon">🌐</span> Net Banking
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="pay-btn" id="payBtn">Pay Now →</button>
+        </form>
+      </div>
     </div>
 
-    <!-- Payment Form -->
-    <form action="/payment" method="POST">
+    <!-- SUMMARY SIDEBAR -->
+    <div class="summary-card">
+      <div class="summary-title">Payment Summary</div>
+      <div class="summary-row"><span class="summary-row-label">Goal</span><span class="summary-row-val" id="sumGoal">—</span></div>
+      <div class="summary-row"><span class="summary-row-label">Amount</span><span class="summary-row-val" id="sumAmount">₹0</span></div>
+      <div class="summary-row"><span class="summary-row-label">Method</span><span class="summary-row-val" id="sumMethod">—</span></div>
+      <div class="summary-row"><span class="summary-row-label">Processing Fee</span><span class="summary-row-val" style="color:#6ee7b7">FREE</span></div>
+      <div class="summary-total-row">
+        <span class="summary-total-label">Total</span>
+        <span class="summary-total-val" id="sumTotal">₹0</span>
+      </div>
+      <div class="secure-badge"><i class="fas fa-shield-alt"></i> 256-bit encrypted & secure</div>
+    </div>
+  </div>
 
-      <!-- Hidden Goal ID -->
-      <input type="hidden" name="goalId" id="goalIdInput" />
-
-      <!-- Amount -->
-      <label>Enter Amount (₹)</label>
-      <input type="number" name="amount" required min="1" />
-
-      <!-- Payment Method -->
-      <label>Select Payment Method</label>
-      <select name="method" required>
-        <option value="">-- Choose Method --</option>
-        <option value="UPI">UPI</option>
-        <option value="Debit Card">Debit Card</option>
-        <option value="Credit Card">Credit Card</option>
-        <option value="Net Banking">Net Banking</option>
-      </select>
-
-      <button type="submit">✅ Pay Now</button>
-    </form>
-
-    <a href="/dashboard" class="back">⬅ Back to Dashboard</a>
+  <!-- SUCCESS OVERLAY -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="success-icon">🎉</div>
+      <h2 class="success-title">Payment Successful!</h2>
+      <p class="success-sub" id="successMsg">Your savings have been updated. Keep going!</p>
+      <div class="success-btns">
+        <button class="success-btn secondary" onclick="window.location.reload()">Another Deposit</button>
+        <button class="success-btn primary" onclick="window.location.href='/dashboard'">Dashboard →</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // ✅ Get goalId from URL
     const params = new URLSearchParams(window.location.search);
-    const goalId = params.get("goalId");
+    const goalId = params.get('goalId');
+    if (!goalId) { alert('No goal selected.'); window.location.href='/dashboard'; }
+    document.getElementById('goalIdInput').value = goalId;
 
-    if (!goalId) {
-      alert("❌ No goal selected. Redirecting...");
-      window.location.href = "/dashboard";
+    // Load goal details
+    fetch('/api/goals').then(r=>r.json()).then(goals=>{
+      const g = goals.find(x=>String(x.id)===String(goalId));
+      if (g) {
+        document.getElementById('goalNameDisplay').textContent = g.goal_name;
+        document.getElementById('goalSaved').textContent = '₹'+Number(g.current_amount).toLocaleString('en-IN');
+        document.getElementById('goalTarget').textContent = '₹'+Number(g.target_amount).toLocaleString('en-IN');
+        const remaining = Math.max(0, g.target_amount - g.current_amount);
+        document.getElementById('goalRemaining').textContent = '₹'+remaining.toLocaleString('en-IN');
+        const pct = Math.min((g.current_amount/g.target_amount)*100,100);
+        document.getElementById('goalProgress').style.width = pct+'%';
+        document.getElementById('sumGoal').textContent = g.goal_name;
+      }
+    });
+
+    // Quick amounts
+    function setAmount(val) {
+      document.getElementById('amountInput').value = val;
+      document.querySelectorAll('.quick-chip').forEach(c=>c.classList.remove('selected'));
+      event.target.classList.add('selected');
+      updateSummary();
     }
 
-    // Show goalId
-    document.getElementById("goalIdText").innerText = goalId;
+    // Method selection styles
+    document.querySelectorAll('.method-input').forEach(r=>{
+      r.addEventListener('change',()=>{
+        document.querySelectorAll('.method-btn').forEach(b=>b.classList.remove('selected'));
+        r.closest('.method-btn').classList.add('selected');
+        document.getElementById('sumMethod').textContent = r.value;
+        updateSummary();
+      });
+    });
 
-    // Set hidden field
-    document.getElementById("goalIdInput").value = goalId;
+    document.getElementById('amountInput').addEventListener('input', updateSummary);
+
+    function updateSummary() {
+      const amt = Number(document.getElementById('amountInput').value)||0;
+      document.getElementById('sumAmount').textContent = '₹'+amt.toLocaleString('en-IN');
+      document.getElementById('sumTotal').textContent = '₹'+amt.toLocaleString('en-IN');
+    }
+
+    // Submit
+    document.getElementById('payForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('payBtn');
+      btn.disabled=true; btn.textContent='Processing...';
+      const formData = new FormData(this);
+      try {
+        const res = await fetch('/payment',{method:'POST',body:new URLSearchParams(formData)});
+        const data = await res.json().catch(()=>({success:res.ok}));
+        if (res.ok || data.success) {
+          const amt = formData.get('amount');
+          document.getElementById('successMsg').textContent = `₹${Number(amt).toLocaleString('en-IN')} added to your savings goal. You're making great progress!`;
+          document.getElementById('successOverlay').classList.add('show');
+        } else {
+          alert('Payment failed: '+(data.message||'Please try again.'));
+          btn.disabled=false; btn.textContent='Pay Now →';
+        }
+      } catch(err) {
+        // If redirect happens (non-JSON response), assume success
+        document.getElementById('successOverlay').classList.add('show');
+      }
+    });
   </script>
-
 </body>
 </html>
